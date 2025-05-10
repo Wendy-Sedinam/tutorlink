@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,7 +18,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, UserPlus } from "lucide-react";
 import { mockStudents, mockTutors } from "@/lib/mock-data";
 import type { Student, Tutor, User } from "@/types";
@@ -34,6 +35,11 @@ export default function SignupForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -121,6 +127,12 @@ export default function SignupForm() {
     }
   }
 
+  if (!isClient) {
+     // Render nothing or a placeholder on the server and during initial client render
+    // to prevent hydration mismatch. The actual form will render after useEffect.
+    return null;
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -206,3 +218,4 @@ export default function SignupForm() {
     </Form>
   );
 }
+

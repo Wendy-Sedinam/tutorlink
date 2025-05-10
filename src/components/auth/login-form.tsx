@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, LogIn } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,11 @@ export default function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -67,6 +73,12 @@ export default function LoginForm() {
       setError("Login failed. User not found or incorrect credentials/role.");
       setIsLoading(false); // Ensure loading is stopped on error
     }
+  }
+
+  if (!isClient) {
+    // Render nothing or a placeholder on the server and during initial client render
+    // to prevent hydration mismatch. The actual form will render after useEffect.
+    return null; 
   }
 
   return (
@@ -141,3 +153,4 @@ export default function LoginForm() {
     </Form>
   );
 }
+
