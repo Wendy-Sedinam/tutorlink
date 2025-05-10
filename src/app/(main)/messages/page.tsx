@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import type { User, Student, Tutor, Conversation, ChatMessage } from '@/types';
-import { mockStudents, mockTutors, mockChatMessages, generateChatId, getMockUserById } from '@/lib/mock-data';
+import { mockStudents, mockTutors, mockChatMessages, generateChatId, getMockUserById, mockBookings } from '@/lib/mock-data';
 import { useEffect, useState, useMemo } from 'react';
 import ConversationListItem from '@/components/chat/conversation-list-item';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -174,3 +174,4 @@ export default function MessagesPage() {
     </div>
   );
 }
+
