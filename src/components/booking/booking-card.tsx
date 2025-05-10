@@ -1,15 +1,15 @@
 "use client";
 
-import type { Booking } from '@/types';
+import type { Booking, AppNotification } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Clock, User, BookOpen, Video, Edit, XCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import { CalendarDays, Clock, User, BookOpen, Video, Edit, XCircle, CheckCircle, AlertCircle, Check } from 'lucide-react';
 import { format, formatDistanceToNowStrict } from 'date-fns';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { mockBookings } from '@/lib/mock-data'; // for cancel action
+import { mockBookings, mockNotifications } from '@/lib/mock-data'; 
 import { useState } from 'react';
 
 interface BookingCardProps {
@@ -34,20 +34,44 @@ const statusIcons: { [key in Booking['status']]: React.ElementType } = {
 
 export default function BookingCard({ booking, currentUserRole }: BookingCardProps) {
   const { toast } = useToast();
-  // Local state to reflect changes immediately, though mockBookings is mutated directly for demo.
   const [currentBookingStatus, setCurrentBookingStatus] = useState(booking.status);
 
 
   const handleCancelBooking = () => {
-    // In a real app, this would be an API call.
     const bookingIndex = mockBookings.findIndex(b => b.id === booking.id);
     if (bookingIndex !== -1) {
       mockBookings[bookingIndex].status = 'cancelled';
-      setCurrentBookingStatus('cancelled'); // Update local state for UI
+      setCurrentBookingStatus('cancelled'); 
       toast({
         title: 'Booking Cancelled',
-        description: `Your session for ${booking.subject} has been cancelled.`,
+        description: `Your session for "${booking.reasonForSession}" has been cancelled.`,
         variant: 'destructive'
+      });
+    }
+  };
+
+  const handleConfirmBooking = () => {
+    const bookingIndex = mockBookings.findIndex(b => b.id === booking.id);
+    if (bookingIndex !== -1 && currentBookingStatus === 'pending') {
+      mockBookings[bookingIndex].status = 'confirmed';
+      setCurrentBookingStatus('confirmed');
+
+      const studentNotification: AppNotification = {
+        id: `notif-student-${Date.now()}`,
+        userId: booking.studentId,
+        title: "Session Confirmed!",
+        message: `Your session for "${booking.reasonForSession}" with ${booking.tutorName} on ${format(new Date(booking.dateTime), "MMM d, yyyy 'at' p")} has been confirmed.`,
+        type: 'booking_confirmed',
+        createdAt: new Date().toISOString(),
+        read: false,
+        link: `/bookings#${booking.id}`,
+      };
+      mockNotifications.push(studentNotification);
+      
+      toast({
+        title: 'Booking Confirmed',
+        description: `Session for "${booking.reasonForSession}" confirmed. Student ${booking.studentName} will be notified.`,
+        variant: 'default'
       });
     }
   };
@@ -66,7 +90,7 @@ export default function BookingCard({ booking, currentUserRole }: BookingCardPro
       <CardHeader className="pb-4 border-b">
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-xl font-semibold text-primary">{booking.subject}</CardTitle>
+            <CardTitle className="text-xl font-semibold text-primary">{booking.reasonForSession}</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               With <Link href={`/${otherPartyRole.toLowerCase()}s/${otherPartyId}`} className="text-accent hover:underline font-medium">{otherPartyName}</Link> ({otherPartyRole})
             </CardDescription>
@@ -77,6 +101,10 @@ export default function BookingCard({ booking, currentUserRole }: BookingCardPro
         </div>
       </CardHeader>
       <CardContent className="py-4 space-y-3 flex-grow">
+        <div className="flex items-center text-sm">
+          <BookOpen className="h-4 w-4 mr-2 text-muted-foreground" />
+          <span className="font-medium text-foreground mr-1">Reason:</span> {booking.reasonForSession}
+        </div>
         <div className="flex items-center text-sm">
           <CalendarDays className="h-4 w-4 mr-2 text-muted-foreground" />
           <span className="font-medium text-foreground mr-1">Date:</span> {format(bookingDate, "EEE, MMM d, yyyy")}
@@ -105,10 +133,14 @@ export default function BookingCard({ booking, currentUserRole }: BookingCardPro
         <p className="text-xs text-muted-foreground">
           {isPast ? 'Session was' : 'Session is'} {formatDistanceToNowStrict(bookingDate, { addSuffix: true })}
         </p>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap justify-end">
+          {currentUserRole === 'tutor' && currentBookingStatus === 'pending' && !isPast && (
+            <Button variant="default" size="sm" onClick={handleConfirmBooking} className="bg-green-600 hover:bg-green-700 text-white">
+              <Check className="h-3 w-3 mr-1.5" /> Confirm
+            </Button>
+          )}
           {(currentBookingStatus === 'pending' || currentBookingStatus === 'confirmed') && !isPast && (
             <>
-              {/* <Button variant="outline" size="sm" disabled> <Edit className="h-3 w-3 mr-1.5" /> Reschedule</Button> */}
               <Button variant="destructive" size="sm" onClick={handleCancelBooking} className="bg-red-600 hover:bg-red-700">
                 <XCircle className="h-3 w-3 mr-1.5" /> Cancel
               </Button>

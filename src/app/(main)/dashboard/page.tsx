@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowRight, BookOpen, CalendarCheck, Users, Bell, CalendarPlus } from 'lucide-react';
-import { mockBookings, mockNotifications } from '@/lib/mock-data';
+import { mockBookings, mockNotifications, mockTutors } from '@/lib/mock-data';
 import Image from 'next/image';
 
 export default function DashboardPage() {
@@ -15,6 +15,12 @@ export default function DashboardPage() {
 
   const upcomingBookings = mockBookings.filter(b => (b.studentId === user.id || b.tutorId === user.id) && new Date(b.dateTime) > new Date() && b.status === 'confirmed').slice(0, 2);
   const unreadNotificationsCount = mockNotifications.filter(n => n.userId === user.id && !n.read).length;
+
+  let assignedStudentsCount = 0;
+  if (user.role === 'tutor') {
+    const currentTutorDetails = mockTutors.find(t => t.id === user.id);
+    assignedStudentsCount = currentTutorDetails?.assignedStudentIds?.length || 0;
+  }
 
   return (
     <div className="space-y-8">
@@ -33,27 +39,39 @@ export default function DashboardPage() {
             <p className="text-lg text-muted-foreground mt-2">
               {user.role === 'student' 
                 ? "Ready to learn something new or need to talk? Let's find your next session." 
-                : "Ready to inspire your students? Manage your schedule and requests here."}
+                : "Ready to inspire your students? Manage your schedule and assigned students here."}
             </p>
           </div>
         </CardContent>
       </Card>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <DashboardCard
-          title={user.role === 'student' ? "Find a Tutor/Counselor" : "Manage Students"}
-          description={user.role === 'student' ? "Browse experts for tutoring or counseling." : "View your student list and requests."}
-          icon={Users}
-          link={user.role === 'student' ? "/tutors" : "/manage/students"}
-          linkLabel={user.role === 'student' ? "Browse Experts" : "View Students"}
-          color="primary"
-        />
+        {user.role === 'student' && (
+          <DashboardCard
+            title="Find a Tutor/Counselor"
+            description="Browse experts for tutoring or counseling."
+            icon={Users}
+            link="/tutors"
+            linkLabel="Browse Experts"
+            color="primary"
+          />
+        )}
+        {user.role === 'tutor' && (
+           <DashboardCard
+            title="My Students"
+            description={`You have ${assignedStudentsCount} student(s) assigned.`}
+            icon={Users}
+            link="/manage/students"
+            linkLabel="View Students"
+            color="primary"
+          />
+        )}
          {user.role === 'student' && (
           <DashboardCard
             title="Request a Session"
             description="Get academic help or counseling support."
             icon={CalendarPlus}
-            link="/tutors"
+            link="/tutors" 
             linkLabel="Find & Request"
             color="accent"
           />
@@ -64,7 +82,7 @@ export default function DashboardPage() {
           icon={CalendarCheck}
           link="/bookings"
           linkLabel="View Bookings"
-          color={user.role === 'student' ? "secondary" : "accent"} // Adjusted color based on student having 3rd card now
+          color={user.role === 'student' ? "secondary" : "accent"}
         />
         <DashboardCard
           title="Notifications"
@@ -72,7 +90,7 @@ export default function DashboardPage() {
           icon={Bell}
           link="/notifications"
           linkLabel="Check Notifications"
-          color="secondary" // Default to secondary if student has 3 cards, or for tutor
+          color="secondary"
           badgeCount={unreadNotificationsCount > 0 ? unreadNotificationsCount : undefined}
         />
       </div>
@@ -87,7 +105,7 @@ export default function DashboardPage() {
             {upcomingBookings.map(booking => (
               <div key={booking.id} className="p-4 border rounded-lg flex justify-between items-center bg-background hover:bg-muted/30 transition-colors">
                 <div>
-                  <h3 className="font-semibold text-foreground">{booking.subject}</h3>
+                  <h3 className="font-semibold text-foreground">{booking.reasonForSession}</h3>
                   <p className="text-sm text-muted-foreground">
                     With {user.role === 'student' ? booking.tutorName : booking.studentName} on {new Date(booking.dateTime).toLocaleDateString()} at {new Date(booking.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>

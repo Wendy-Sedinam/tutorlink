@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,7 +18,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, UserPlus } from "lucide-react";
 import { mockStudents, mockTutors } from "@/lib/mock-data";
 import type { Student, Tutor, User } from "@/types";
@@ -34,6 +35,11 @@ export default function SignupForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -53,18 +59,48 @@ export default function SignupForm() {
 
     // Create a new mock user
     const newUserId = `user${Date.now()}`;
-    const newUser: User = { // Explicitly type as User for clarity before pushing
+    const newUserBase = {
       id: newUserId,
       name: values.name,
       email: values.email,
-      role: values.role,
+      // Password is not stored in mock user object for simplicity
       avatarUrl: `https://picsum.photos/seed/${newUserId}/200/200`,
-      bio: values.role === 'tutor' ? "New tutor, ready to teach!" : "New student, eager to learn!",
     };
 
+    let newUser: User;
+
     if (values.role === 'student') {
+      newUser = {
+        ...newUserBase,
+        role: 'student',
+        bio: "New student, eager to learn!",
+        learningPreferences: "Not specified yet.",
+        subjectInterests: [],
+      } as Student;
       mockStudents.push(newUser as Student);
+      // Assign student to the first tutor for simplicity
+      if (mockTutors.length > 0) {
+        const tutorToAssign = mockTutors[0];
+        if (!tutorToAssign.assignedStudentIds) {
+          tutorToAssign.assignedStudentIds = [];
+        }
+        // Ensure no duplicates if this logic runs multiple times for the same user (though unlikely with newUserId)
+        if (!tutorToAssign.assignedStudentIds.includes(newUser.id)) {
+            tutorToAssign.assignedStudentIds.push(newUser.id);
+        }
+      }
     } else {
+      newUser = {
+        ...newUserBase,
+        role: 'tutor',
+        bio: "New tutor, ready to teach!",
+        headline: "Enthusiastic new tutor",
+        subjectMatterExpertise: [],
+        descriptionOfExpertise: "Looking forward to helping students!",
+        teachingStyle: "Flexible and adaptive",
+        yearsOfExperience: 0,
+        assignedStudentIds: [],
+      } as Tutor;
       mockTutors.push(newUser as Tutor);
     }
     
@@ -78,6 +114,10 @@ export default function SignupForm() {
       if (values.role === 'student') {
         const index = mockStudents.findIndex(s => s.id === newUserId);
         if (index > -1) mockStudents.splice(index, 1);
+         // Also remove from tutor's assigned list if assignment happened
+        if (mockTutors.length > 0 && mockTutors[0].assignedStudentIds?.includes(newUserId)) {
+            mockTutors[0].assignedStudentIds = mockTutors[0].assignedStudentIds.filter(id => id !== newUserId);
+        }
       } else {
         const index = mockTutors.findIndex(t => t.id === newUserId);
         if (index > -1) mockTutors.splice(index, 1);
@@ -85,6 +125,12 @@ export default function SignupForm() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  if (!isClient) {
+     // Render nothing or a placeholder on the server and during initial client render
+    // to prevent hydration mismatch. The actual form will render after useEffect.
+    return null;
   }
 
   return (
@@ -172,3 +218,4 @@ export default function SignupForm() {
     </Form>
   );
 }
+

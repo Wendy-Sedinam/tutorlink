@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,10 +16,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, LogIn } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { mockStudents, mockTutors } from "@/lib/mock-data";
+import type { User } from "@/types";
 
 
 const formSchema = z.object({
@@ -32,6 +35,11 @@ export default function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,18 +56,29 @@ export default function LoginForm() {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // In a real app, you'd verify credentials. Here, we just log in with a mock user.
-    // For simplicity, we'll use a fixed user ID based on role or a demo user.
-    const userIdToLogin = values.role === 'student' ? 'student1' : 'tutor1'; 
-    
-    try {
-      login({ userId: userIdToLogin, role: values.role }); // Updated login call
-      router.push("/dashboard");
-    } catch (e) {
-      setError("Login failed. Please check your credentials or role.");
-    } finally {
-      setIsLoading(false);
+    let foundUser: User | undefined;
+
+    if (values.role === 'student') {
+      foundUser = mockStudents.find(s => s.email === values.email);
+    } else {
+      foundUser = mockTutors.find(t => t.email === values.email);
     }
+    
+    if (foundUser) {
+      // In a real app, you would also verify the password here.
+      // For this mock app, finding by email and role is sufficient.
+      login(foundUser); // Pass the full user object
+      router.push("/dashboard");
+    } else {
+      setError("Login failed. User not found or incorrect credentials/role.");
+      setIsLoading(false); // Ensure loading is stopped on error
+    }
+  }
+
+  if (!isClient) {
+    // Render nothing or a placeholder on the server and during initial client render
+    // to prevent hydration mismatch. The actual form will render after useEffect.
+    return null; 
   }
 
   return (
@@ -134,3 +153,4 @@ export default function LoginForm() {
     </Form>
   );
 }
+

@@ -26,14 +26,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2, Send } from "lucide-react";
-import type { Tutor, Student, Booking } from "@/types";
+import type { Tutor, Student, Booking, AppNotification } from "@/types";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { mockBookings } from "@/lib/mock-data"; // To add the new booking
+import { mockBookings, mockNotifications } from "@/lib/mock-data"; // To add the new booking and notification
 import { useRouter } from "next/navigation";
 
 const bookingFormSchema = z.object({
-  subject: z.string({required_error: "Please select a subject."}),
+  reasonForSession: z.string({required_error: "Please select a reason for the session."}),
   date: z.date({ required_error: "Please select a date for the session." }),
   timeSlot: z.string({ required_error: "Please select a time slot."}),
   durationMinutes: z.coerce.number().min(30, "Duration must be at least 30 minutes.").max(240, "Duration cannot exceed 4 hours."),
@@ -68,7 +68,7 @@ export default function BookingForm({ tutor, student }: BookingFormProps) {
   const form = useForm<z.infer<typeof bookingFormSchema>>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
-      subject: tutor.subjectMatterExpertise?.[0] || "",
+      reasonForSession: tutor.subjectMatterExpertise?.[0] || "",
       durationMinutes: 60,
       notes: "",
     },
@@ -108,23 +108,36 @@ export default function BookingForm({ tutor, student }: BookingFormProps) {
       tutorName: tutor.name,
       dateTime: bookingDateTime.toISOString(),
       durationMinutes: values.durationMinutes,
-      subject: values.subject,
-      status: "pending", // Or 'confirmed' if auto-confirming
+      reasonForSession: values.reasonForSession,
+      status: "pending", 
       notes: values.notes,
     };
 
-    mockBookings.push(newBooking); // Add to mock data
+    mockBookings.push(newBooking); 
+
+    // Notify Tutor
+    const tutorNotification: AppNotification = {
+      id: `notif-tutor-${Date.now()}`,
+      userId: tutor.id,
+      title: "New Session Request",
+      message: `${student.name} requested a session for "${newBooking.reasonForSession}".`,
+      type: 'booking_request',
+      createdAt: new Date().toISOString(),
+      read: false,
+      link: `/bookings#${newBooking.id}`,
+    };
+    mockNotifications.push(tutorNotification);
 
     toast({
       title: "Booking Request Sent!",
-      description: `Your request for a session on ${values.subject} with ${tutor.name} has been sent.`,
+      description: `Your request for a session on ${values.reasonForSession} with ${tutor.name} has been sent. The tutor will be notified.`,
       variant: "default"
     });
     setIsLoading(false);
     form.reset();
     setSelectedDate(undefined);
     setTimeSlotsForSelectedDate([]);
-    router.push('/bookings'); // Redirect to bookings page
+    router.push('/bookings'); 
   }
 
   return (
@@ -132,14 +145,14 @@ export default function BookingForm({ tutor, student }: BookingFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="subject"
+          name="reasonForSession"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Subject</FormLabel>
+              <FormLabel>Reason for Session</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a subject" />
+                    <SelectValue placeholder="Select a reason/subject" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

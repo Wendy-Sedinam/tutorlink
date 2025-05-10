@@ -1,8 +1,8 @@
 "use client";
 
 import { useAuth } from '@/hooks/use-auth';
-import { mockBookings, mockStudents } from '@/lib/mock-data';
-import type { Student } from '@/types';
+import { mockBookings, mockStudents, mockTutors } from '@/lib/mock-data';
+import type { Student, Tutor } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Mail, Users, BookOpen, CalendarCheck } from 'lucide-react';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
 interface StudentDisplayInfo extends Student {
-  lastBookingSubject?: string;
+  lastBookingReasonForSession?: string; // Changed from lastBookingSubject
   lastBookingDate?: string;
 }
 
@@ -21,33 +21,35 @@ export default function ManageStudentsPage() {
     return <p className="text-center py-10">Access denied. This page is for tutors only.</p>;
   }
 
-  const tutorBookings = mockBookings.filter(booking => booking.tutorId === user.id);
-  
-  const studentIdsFromBookings = Array.from(new Set(tutorBookings.map(b => b.studentId)));
-  
-  const students: StudentDisplayInfo[] = studentIdsFromBookings.map(studentId => {
-    const studentDetails = mockStudents.find(s => s.id === studentId);
-    if (!studentDetails) return null;
+  const currentTutor = mockTutors.find(t => t.id === user.id);
+  let students: StudentDisplayInfo[] = [];
 
-    const studentBookings = tutorBookings
-        .filter(b => b.studentId === studentId)
-        .sort((a,b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
-    
-    const lastBooking = studentBookings[0];
+  if (currentTutor && currentTutor.assignedStudentIds) {
+    students = currentTutor.assignedStudentIds.map(studentId => {
+      const studentDetails = mockStudents.find(s => s.id === studentId);
+      if (!studentDetails) return null;
 
-    return {
-      ...studentDetails,
-      lastBookingSubject: lastBooking?.subject,
-      lastBookingDate: lastBooking ? new Date(lastBooking.dateTime).toLocaleDateString() : undefined,
-    };
-  }).filter(Boolean) as StudentDisplayInfo[];
+      // Find last booking specifically with this tutor
+      const studentBookingsWithThisTutor = mockBookings
+          .filter(b => b.studentId === studentId && b.tutorId === user.id)
+          .sort((a,b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
+      
+      const lastBooking = studentBookingsWithThisTutor[0];
+
+      return {
+        ...studentDetails,
+        lastBookingReasonForSession: lastBooking?.reasonForSession, // Changed from lastBooking?.subject
+        lastBookingDate: lastBooking ? new Date(lastBooking.dateTime).toLocaleDateString() : undefined,
+      };
+    }).filter(Boolean) as StudentDisplayInfo[];
+  }
 
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Manage Students</h1>
-        <p className="text-lg text-gray-600">View students who have scheduled sessions with you.</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">My Students</h1>
+        <p className="text-lg text-gray-600">View students who have been assigned to you.</p>
       </div>
 
       {students.length > 0 ? (
@@ -60,11 +62,11 @@ export default function ManageStudentsPage() {
         <Card className="text-center py-16 shadow-sm">
           <CardHeader>
             <Users className="mx-auto h-20 w-20 text-muted-foreground mb-4" />
-            <CardTitle className="text-2xl">No Students Yet</CardTitle>
+            <CardTitle className="text-2xl">No Students Assigned Yet</CardTitle>
           </CardHeader>
           <CardContent>
             <CardDescription className="text-lg">
-              Students who book sessions with you will appear here.
+              Newly signed up students will be automatically assigned and will appear here.
             </CardDescription>
           </CardContent>
         </Card>
@@ -106,12 +108,18 @@ function StudentInfoCard({ student }: StudentInfoCardProps) {
             </div>
           </div>
         )}
-         {student.lastBookingSubject && student.lastBookingDate && (
+         {student.lastBookingReasonForSession && student.lastBookingDate && ( // Changed from student.lastBookingSubject
           <div className="text-sm">
-             <p className="font-medium text-foreground mb-1 flex items-center"><CalendarCheck className="h-4 w-4 mr-2 text-accent" />Last Session:</p>
-            <p className="text-muted-foreground">{student.lastBookingSubject} on {student.lastBookingDate}</p>
+             <p className="font-medium text-foreground mb-1 flex items-center"><CalendarCheck className="h-4 w-4 mr-2 text-accent" />Last Session (with you):</p>
+            <p className="text-muted-foreground">{student.lastBookingReasonForSession} on {student.lastBookingDate}</p>
           </div>
         )}
+         {!student.lastBookingDate && (
+             <div className="text-sm">
+                <p className="font-medium text-foreground mb-1 flex items-center"><CalendarCheck className="h-4 w-4 mr-2 text-muted-foreground" />Last Session (with you):</p>
+                <p className="text-muted-foreground">No booking history yet.</p>
+            </div>
+         )}
         {student.bio && (
              <div className="text-sm">
                 <p className="font-medium text-foreground mb-1">Bio:</p>
@@ -119,10 +127,10 @@ function StudentInfoCard({ student }: StudentInfoCardProps) {
              </div>
         )}
       </CardContent>
-      {/* Footer can be added for actions like "View Full Profile" if student profiles become viewable by tutors */}
-      {/* <CardFooter className="border-t pt-4">
+      {/* Potential future actions:
+      <CardFooter className="border-t pt-4">
         <Button variant="outline" size="sm" asChild>
-          <Link href={`/students/${student.id}`}>View Full Profile</Link> // Requires /students/[studentId] page
+           View Chat / Send Message (Not Implemented)
         </Button>
       </CardFooter> */}
     </Card>
