@@ -56,3 +56,22 @@ export interface CompatibilityScoreInfo {
   justification: string;
 }
 
+export interface ChatMessage {
+  id: string;
+  chatId: string; // Format: sortedUserIds.join('_') e.g., "student1_tutor1"
+  senderId: string;
+  receiverId: string;
+  text: string;
+  timestamp: string; // ISO string
+  read: boolean;
+}
+
+export interface Conversation {
+  chatId: string;
+  otherUserId: string;
+  otherUserName: string;
+  otherUserAvatar?: string;
+  otherUserRole: 'student' | 'tutor';
+  lastMessage?: ChatMessage;
+  unreadCount: number;
+}

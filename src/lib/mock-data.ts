@@ -1,4 +1,4 @@
-import type { Student, Tutor, Booking, AppNotification } from '@/types';
+import type { Student, Tutor, Booking, AppNotification, ChatMessage } from '@/types';
 import { AVAILABLE_SUBJECTS } from './constants';
 
 
@@ -164,3 +164,45 @@ export const getMockUserById = (userId: string): Student | Tutor | undefined => 
   return mockStudents.find(s => s.id === userId) || mockTutors.find(t => t.id === userId);
 };
 
+export const generateChatId = (userId1: string, userId2: string): string => {
+  return [userId1, userId2].sort().join('_');
+};
+
+export const mockChatMessages: ChatMessage[] = [
+  {
+    id: 'msg1',
+    chatId: generateChatId('student1', 'tutor1'),
+    senderId: 'student1',
+    receiverId: 'tutor1',
+    text: 'Hi Dr. Vance, I had a quick question about our upcoming session.',
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+    read: true,
+  },
+  {
+    id: 'msg2',
+    chatId: generateChatId('student1', 'tutor1'),
+    senderId: 'tutor1',
+    receiverId: 'student1',
+    text: 'Hello Alice, I\'m here to help. What\'s your question?',
+    timestamp: new Date(Date.now() - 1.9 * 60 * 60 * 1000).toISOString(), // 1.9 hours ago
+    read: true,
+  },
+  {
+    id: 'msg3',
+    chatId: generateChatId('student1', 'tutor1'),
+    senderId: 'student1',
+    receiverId: 'tutor1',
+    text: 'Should I prepare anything specific for the calculus problem-solving session?',
+    timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+    read: false, // Tutor hasn't read this yet
+  },
+  {
+    id: 'msg4',
+    chatId: generateChatId('student2', 'tutor2'),
+    senderId: 'student2',
+    receiverId: 'tutor2',
+    text: 'Hey Marcus, I\'m a bit stuck on the Python project. Can we look at the file I sent?',
+    timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+    read: false, // Tutor hasn't read
+  }
+];

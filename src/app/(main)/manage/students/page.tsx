@@ -1,16 +1,18 @@
+
 "use client";
 
 import { useAuth } from '@/hooks/use-auth';
-import { mockBookings, mockStudents, mockTutors } from '@/lib/mock-data';
+import { mockBookings, mockStudents, mockTutors, generateChatId } from '@/lib/mock-data';
 import type { Student, Tutor } from '@/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Mail, Users, BookOpen, CalendarCheck } from 'lucide-react';
+import { Mail, Users, BookOpen, CalendarCheck, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface StudentDisplayInfo extends Student {
-  lastBookingReasonForSession?: string; // Changed from lastBookingSubject
+  lastBookingReasonForSession?: string; 
   lastBookingDate?: string;
 }
 
@@ -29,7 +31,6 @@ export default function ManageStudentsPage() {
       const studentDetails = mockStudents.find(s => s.id === studentId);
       if (!studentDetails) return null;
 
-      // Find last booking specifically with this tutor
       const studentBookingsWithThisTutor = mockBookings
           .filter(b => b.studentId === studentId && b.tutorId === user.id)
           .sort((a,b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
@@ -38,7 +39,7 @@ export default function ManageStudentsPage() {
 
       return {
         ...studentDetails,
-        lastBookingReasonForSession: lastBooking?.reasonForSession, // Changed from lastBooking?.subject
+        lastBookingReasonForSession: lastBooking?.reasonForSession,
         lastBookingDate: lastBooking ? new Date(lastBooking.dateTime).toLocaleDateString() : undefined,
       };
     }).filter(Boolean) as StudentDisplayInfo[];
@@ -55,7 +56,7 @@ export default function ManageStudentsPage() {
       {students.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {students.map(student => (
-            <StudentInfoCard key={student.id} student={student} />
+            <StudentInfoCard key={student.id} student={student} tutorId={user.id} />
           ))}
         </div>
       ) : (
@@ -77,9 +78,11 @@ export default function ManageStudentsPage() {
 
 interface StudentInfoCardProps {
   student: StudentDisplayInfo;
+  tutorId: string;
 }
 
-function StudentInfoCard({ student }: StudentInfoCardProps) {
+function StudentInfoCard({ student, tutorId }: StudentInfoCardProps) {
+  const chatId = generateChatId(student.id, tutorId);
   return (
     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col bg-card">
       <CardHeader className="pb-4 border-b">
@@ -108,7 +111,7 @@ function StudentInfoCard({ student }: StudentInfoCardProps) {
             </div>
           </div>
         )}
-         {student.lastBookingReasonForSession && student.lastBookingDate && ( // Changed from student.lastBookingSubject
+         {student.lastBookingReasonForSession && student.lastBookingDate && ( 
           <div className="text-sm">
              <p className="font-medium text-foreground mb-1 flex items-center"><CalendarCheck className="h-4 w-4 mr-2 text-accent" />Last Session (with you):</p>
             <p className="text-muted-foreground">{student.lastBookingReasonForSession} on {student.lastBookingDate}</p>
@@ -123,16 +126,17 @@ function StudentInfoCard({ student }: StudentInfoCardProps) {
         {student.bio && (
              <div className="text-sm">
                 <p className="font-medium text-foreground mb-1">Bio:</p>
-                <p className="text-muted-foreground text-xs italic truncate">{student.bio}</p>
+                <p className="text-muted-foreground text-xs italic line-clamp-2">{student.bio}</p>
              </div>
         )}
       </CardContent>
-      {/* Potential future actions:
       <CardFooter className="border-t pt-4">
-        <Button variant="outline" size="sm" asChild>
-           View Chat / Send Message (Not Implemented)
+        <Button variant="outline" size="sm" asChild className="w-full">
+           <Link href={`/messages/${chatId}`}>
+             <MessageSquare className="mr-2 h-4 w-4" /> Message Student
+           </Link>
         </Button>
-      </CardFooter> */}
+      </CardFooter>
     </Card>
   );
 }

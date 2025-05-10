@@ -6,10 +6,10 @@ import { usePathname } from 'next/navigation';
 import Logo from '@/components/shared/logo';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LayoutDashboard, Users, CalendarDays, Bell, UserCircle, LogOut, LogIn, UserPlus } from 'lucide-react';
+import { Menu, LayoutDashboard, Users, CalendarDays, Bell, UserCircle, LogOut, LogIn, UserPlus, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import React from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,13 +19,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import React from 'react';
 
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/tutors', label: 'Find Tutors', icon: Users },
   { href: '/bookings', label: 'My Bookings', icon: CalendarDays },
+  { href: '/messages', label: 'Messages', icon: MessageSquare },
   { href: '/notifications', label: 'Notifications', icon: Bell },
 ];
 

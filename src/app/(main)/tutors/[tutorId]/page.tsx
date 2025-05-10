@@ -1,13 +1,14 @@
+
 "use client";
 
 import { useParams } from 'next/navigation';
-import { mockTutors, getMockUserById } from '@/lib/mock-data';
+import { mockTutors, getMockUserById, generateChatId, mockChatMessages } from '@/lib/mock-data';
 import type { Tutor, Student, CompatibilityScoreInfo } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, MessageCircle, BookOpen, CalendarDays, Users, Zap, Loader2, Brain, Handshake } from 'lucide-react'; // Removed DollarSign, Added Handshake
+import { Star, MessageCircle, BookOpen, CalendarDays, Users, Zap, Loader2, Brain, Handshake, MessageSquare } from 'lucide-react'; 
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import BookingForm from '@/components/booking/booking-form';
@@ -30,9 +31,10 @@ export default function TutorProfilePage() {
   const { user: currentUser } = useAuth();
   const [compatibility, setCompatibility] = useState<CompatibilityScoreInfo | null>(null);
   const [isLoadingCompatibility, setIsLoadingCompatibility] = useState(false);
+  const [canChat, setCanChat] = useState(false);
+  const [chatId, setChatId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate fetching tutor data
     const foundTutor = getMockUserById(tutorId) as Tutor | undefined;
     if (foundTutor && foundTutor.role === 'tutor') {
       setTutor(foundTutor);
@@ -61,7 +63,19 @@ export default function TutorProfilePage() {
       }
     };
 
-    if (tutor) fetchCompatibility();
+    if (tutor && currentUser?.role === 'student') {
+      fetchCompatibility();
+      const currentChatId = generateChatId(currentUser.id, tutor.id);
+      setChatId(currentChatId);
+      // Enable chat if student is assigned to this tutor or has prior chat history.
+      // For mock, assignment check is simplified. A more robust check might be needed.
+      const isAssigned = tutor.assignedStudentIds?.includes(currentUser.id);
+      const hasChatHistory = mockChatMessages.some(msg => msg.chatId === currentChatId);
+      setCanChat(!!isAssigned || hasChatHistory);
+    } else {
+      setCanChat(false);
+      setChatId(null);
+    }
   }, [tutor, currentUser]);
 
   if (isLoading) {
@@ -172,17 +186,16 @@ export default function TutorProfilePage() {
           </Card>
         </div>
 
-        {/* Right Column: Booking */}
+        {/* Right Column: Actions */}
         <div className="md:col-span-1 space-y-8">
           <Card className="shadow-xl sticky top-24">
             <CardHeader>
               <CardTitle className="text-2xl text-center">Book a Session</CardTitle>
-              {/* Hourly rate display removed */}
                <CardDescription className="text-center text-lg text-muted-foreground pt-2">
                   All sessions are free.
                 </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               {currentUser?.role === 'student' ? (
                 <BookingForm tutor={tutor} student={currentUser as Student} />
               ) : currentUser?.role === 'tutor' ? (
@@ -190,6 +203,13 @@ export default function TutorProfilePage() {
               ) : (
                  <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
                     <Link href={`/login?redirect=/tutors/${tutor.id}`}>Login to Book</Link>
+                </Button>
+              )}
+              {currentUser?.role === 'student' && canChat && chatId && (
+                <Button variant="outline" asChild className="w-full">
+                  <Link href={`/messages/${chatId}`}>
+                    <MessageSquare className="mr-2 h-4 w-4" /> Message Tutor
+                  </Link>
                 </Button>
               )}
             </CardContent>
@@ -229,6 +249,3 @@ const InfoItem = ({ icon: Icon, label, children }: InfoItemProps) => (
     </div>
   </div>
 );
-
-
-
