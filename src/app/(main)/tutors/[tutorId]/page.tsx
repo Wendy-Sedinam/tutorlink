@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { mockTutors, getMockUserById } from '@/lib/mock-data';
-import type { Tutor, Student } from '@/types';
+import type { Tutor, Student, CompatibilityScoreInfo } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +28,7 @@ export default function TutorProfilePage() {
   const [tutor, setTutor] = useState<Tutor | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { user: currentUser } = useAuth();
-  const [compatibility, setCompatibility] =<{ score: number; justification: string } | null>(null);
+  const [compatibility, setCompatibility] = useState<CompatibilityScoreInfo | null>(null);
   const [isLoadingCompatibility, setIsLoadingCompatibility] = useState(false);
 
   useEffect(() => {
@@ -229,3 +229,6 @@ const InfoItem = ({ icon: Icon, label, children }: InfoItemProps) => (
     </div>
   </div>
 );
+
+
+
