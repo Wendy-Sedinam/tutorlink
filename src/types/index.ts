@@ -24,6 +24,7 @@ export interface Tutor extends User {
   overallRating?: number; // 0-5
   reviewsCount?: number;
   yearsOfExperience?: number;
+  assignedStudentIds?: string[]; // Added for automatic student assignment
 }
 
 export interface Booking {
@@ -55,3 +56,4 @@ export interface CompatibilityScoreInfo {
   score: number; // 0-1 (represents 0-100%)
   justification: string;
 }
+

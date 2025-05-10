@@ -45,6 +45,7 @@ export const mockTutors: Tutor[] = [
     overallRating: 4.9,
     reviewsCount: 120,
     yearsOfExperience: 10,
+    assignedStudentIds: [],
   },
   {
     id: 'tutor2',
@@ -66,6 +67,7 @@ export const mockTutors: Tutor[] = [
     overallRating: 4.7,
     reviewsCount: 85,
     yearsOfExperience: 5,
+    assignedStudentIds: [],
   },
   {
     id: 'tutor3',
@@ -86,6 +88,7 @@ export const mockTutors: Tutor[] = [
     overallRating: 4.8,
     reviewsCount: 92,
     yearsOfExperience: 7,
+    assignedStudentIds: [],
   },
 ];
 
@@ -163,3 +166,4 @@ export const mockNotifications: AppNotification[] = [
 export const getMockUserById = (userId: string): Student | Tutor | undefined => {
   return mockStudents.find(s => s.id === userId) || mockTutors.find(t => t.id === userId);
 };
+
