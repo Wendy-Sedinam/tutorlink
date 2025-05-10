@@ -13,7 +13,7 @@ export default function SignupPage() {
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold">Create Your Account</CardTitle>
-          <CardDescription>Join MentorLink and start connecting with tutors or students today.</CardDescription>
+          <CardDescription>Join TutorLink and start connecting with tutors or students today.</CardDescription>
         </CardHeader>
         <CardContent>
           <SignupForm />

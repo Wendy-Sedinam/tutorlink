@@ -26,7 +26,7 @@ export default function HomePage() {
         <section className="py-16 md:py-24">
           <div className="container max-w-screen-xl px-4 md:px-8 text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground mb-6">
-              Unlock Your Potential with <span className="text-primary">MentorLink</span>
+              Unlock Your Potential with <span className="text-primary">TutorLink</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
               Connect with expert tutors, get personalized guidance, and achieve your learning goals. Our AI-powered matching ensures you find the perfect mentor.
@@ -50,7 +50,7 @@ export default function HomePage() {
         <section className="container max-w-screen-lg px-4 md:px-8 mx-auto -mt-8 md:-mt-12 mb-16">
           <div className="bg-card p-2 rounded-xl shadow-2xl overflow-hidden">
             <Image 
-              src="https://picsum.photos/seed/mentorlink-hero/1200/600"
+              src="https://picsum.photos/seed/tutorlink-hero/1200/600"
               alt="Diverse group of students and tutors collaborating"
               width={1200}
               height={600}
@@ -65,7 +65,7 @@ export default function HomePage() {
         {/* Features Section */}
         <section id="features" className="py-16 md:py-24 bg-card">
           <div className="container max-w-screen-xl px-4 md:px-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">Why Choose MentorLink?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">Why Choose TutorLink?</h2>
             <p className="text-lg text-muted-foreground text-center max-w-xl mx-auto mb-12">
               We provide the tools and connections you need to succeed.
             </p>
@@ -100,7 +100,7 @@ export default function HomePage() {
           <div className="container max-w-screen-md px-4 md:px-8 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">Ready to Elevate Your Learning?</h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Join MentorLink today and take the next step in your educational journey.
+              Join TutorLink today and take the next step in your educational journey.
             </p>
             <Button size="lg" asChild className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
               <Link href="/signup">
@@ -112,7 +112,7 @@ export default function HomePage() {
       </main>
 
       <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border/40 bg-background">
-        &copy; {new Date().getFullYear()} MentorLink. All rights reserved.
+        &copy; {new Date().getFullYear()} TutorLink. All rights reserved.
       </footer>
     </div>
   );

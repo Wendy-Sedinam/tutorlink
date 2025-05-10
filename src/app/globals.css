@@ -4,84 +4,45 @@
 
 @layer base {
   :root {
-    --background: 0 0% 93.3%; /* Light gray (#EEEEEE) */
-    --foreground: 20 14.3% 4.1%; /* Dark text for readability */
+    --background: 232 75% 9%; /* #0A0C23 */
+    --foreground: 0 0% 100%; /* White */
 
-    --card: 0 0% 100%; /* White for cards */
-    --card-foreground: 20 14.3% 4.1%;
+    --card: 232 70% 12%; /* #16182F */
+    --card-foreground: 0 0% 100%; /* White */
 
-    --popover: 0 0% 100%; /* White for popovers */
-    --popover-foreground: 20 14.3% 4.1%;
+    --popover: 232 70% 12%; /* #16182F */
+    --popover-foreground: 0 0% 100%; /* White */
 
-    --primary: 174 45% 50%; /* Soft teal (#4DB6AC) */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 28 100% 50%; /* Orange #FF7300 */
+    --primary-foreground: 0 0% 100%; /* White - for better contrast on orange */
 
-    --secondary: 174 40% 75%; /* Lighter teal */
-    --secondary-foreground: 174 45% 25%; /* Darker teal for text on secondary */
+    --secondary: 28 100% 70%; /* Lighter Orange #FFAA73 */
+    --secondary-foreground: 20 14.3% 4.1%; /* Dark text for lighter orange */
 
-    --muted: 0 0% 85%; /* A slightly darker gray than background for muted elements/borders */
-    --muted-foreground: 0 0% 40%; /* Gray text for muted content */
+    --muted: 232 50% 20%; /* Darker Gray #242648 */
+    --muted-foreground: 232 30% 75%; /* Lighter Gray text #A8AABC */
 
-    --accent: 14 100% 63%; /* Warm orange (#FF7043) */
+    --accent: 174 70% 45%; /* Teal #23C4B4 */
     --accent-foreground: 0 0% 100%; /* White */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%; /* Default Red */
+    --destructive-foreground: 0 0% 98%; /* Default Light */
 
-    --border: 0 0% 80%; /* Border color, slightly darker than muted */
-    --input: 0 0% 80%; /* Input border color */
-    --ring: 14 100% 63%; /* Orange for focus rings */
+    --border: 232 70% 15%; /* #1C1E3B */
+    --input: 232 70% 15%; /* #1C1E3B */
+    --ring: 174 70% 45%; /* Teal for focus rings */
 
     --radius: 0.5rem;
 
-    /* Sidebar specific theme variables - can be adjusted if a distinct sidebar theme is needed */
-    --sidebar-background: 0 0% 100%; /* Default to white for a clean sidebar against gray background */
-    --sidebar-foreground: 20 14.3% 4.1%;
-    --sidebar-primary: 174 45% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 14 100% 63%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 85%;
-    --sidebar-ring: 14 100% 63%;
-  }
-
-  .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 0 0% 93.3%;
-
-    --card: 20 10% 10%;
-    --card-foreground: 0 0% 93.3%;
-
-    --popover: 20 10% 10%;
-    --popover-foreground: 0 0% 93.3%;
-
-    --primary: 174 45% 50%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 174 40% 30%;
-    --secondary-foreground: 0 0% 93.3%;
-
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
-
-    --accent: 14 100% 63%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 14 100% 63%;
-
-    --sidebar-background: 20 10% 8%;
-    --sidebar-foreground: 0 0% 93.3%;
-    --sidebar-primary: 174 45% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 14 100% 63%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 14 100% 63%;
+    /* Sidebar specific theme variables */
+    --sidebar-background: hsl(var(--card)); 
+    --sidebar-foreground: hsl(var(--card-foreground));
+    --sidebar-primary: hsl(var(--primary));
+    --sidebar-primary-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: hsl(var(--accent));
+    --sidebar-accent-foreground: hsl(var(--accent-foreground));
+    --sidebar-border: hsl(var(--border));
+    --sidebar-ring: hsl(var(--ring));
   }
 }
 

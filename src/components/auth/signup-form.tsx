@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2, UserPlus } from "lucide-react";
 import { mockStudents, mockTutors } from "@/lib/mock-data";
-import type { Student, Tutor } from "@/types";
+import type { Student, Tutor, User } from "@/types";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -30,7 +30,7 @@ const formSchema = z.object({
 });
 
 export default function SignupForm() {
-  const { login } = useAuth(); // We'll use login to set the new user as active
+  const { login } = useAuth(); 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +53,7 @@ export default function SignupForm() {
 
     // Create a new mock user
     const newUserId = `user${Date.now()}`;
-    const newUser = {
+    const newUser: User = { // Explicitly type as User for clarity before pushing
       id: newUserId,
       name: values.name,
       email: values.email,
@@ -69,16 +69,18 @@ export default function SignupForm() {
     }
     
     try {
-      // Log in the newly created user
-      login(newUserId, values.role);
-      router.push("/dashboard"); // Or to a profile setup page
+      // Log in the newly created user by passing the full user object
+      login(newUser); 
+      router.push("/dashboard"); 
     } catch (e) {
       setError("Signup failed. Please try again.");
       // remove user from mock data if login fails
       if (values.role === 'student') {
-        mockStudents.pop();
+        const index = mockStudents.findIndex(s => s.id === newUserId);
+        if (index > -1) mockStudents.splice(index, 1);
       } else {
-        mockTutors.pop();
+        const index = mockTutors.findIndex(t => t.id === newUserId);
+        if (index > -1) mockTutors.splice(index, 1);
       }
     } finally {
       setIsLoading(false);

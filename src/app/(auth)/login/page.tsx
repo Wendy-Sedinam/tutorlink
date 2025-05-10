@@ -13,7 +13,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold">Welcome Back!</CardTitle>
-          <CardDescription>Sign in to continue your learning journey with MentorLink.</CardDescription>
+          <CardDescription>Sign in to continue your learning journey with TutorLink.</CardDescription>
         </CardHeader>
         <CardContent>
           <LoginForm />

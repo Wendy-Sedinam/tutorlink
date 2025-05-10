@@ -53,7 +53,7 @@ export default function LoginForm() {
     const userIdToLogin = values.role === 'student' ? 'student1' : 'tutor1'; 
     
     try {
-      login(userIdToLogin, values.role);
+      login({ userId: userIdToLogin, role: values.role }); // Updated login call
       router.push("/dashboard");
     } catch (e) {
       setError("Login failed. Please check your credentials or role.");

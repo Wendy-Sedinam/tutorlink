@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'MentorLink',
+  title: 'TutorLink',
   description: 'Connect with expert tutors and enhance your learning.',
 };
 
