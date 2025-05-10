@@ -33,7 +33,7 @@ export default function BookingsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">My Bookings</h1>
-        <p className="text-lg text-muted-foreground">Manage your scheduled sessions and view your booking history.</p>
+        <p className="text-lg text-gray-600">Manage your scheduled sessions and view your booking history.</p> {/* Changed text-muted-foreground to text-gray-600 */}
       </div>
 
       <Tabs defaultValue="upcoming" className="w-full">
@@ -53,7 +53,7 @@ export default function BookingsPage() {
               ))}
             </div>
           ) : (
-            <Card className="py-12 text-center shadow-sm">
+            <Card className="py-12 text-center shadow-sm"> {/* Card has its own dark background, text-muted-foreground is fine here */}
               <CardHeader>
                 <CheckCircle2 className="mx-auto h-16 w-16 text-green-500 mb-4" />
                 <CardTitle className="text-2xl">No Upcoming Bookings</CardTitle>
@@ -74,7 +74,7 @@ export default function BookingsPage() {
               ))}
             </div>
           ) : (
-             <Card className="py-12 text-center shadow-sm">
+             <Card className="py-12 text-center shadow-sm"> {/* Card has its own dark background, text-muted-foreground is fine here */}
                <CardHeader>
                 <AlertTriangle className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
                 <CardTitle className="text-2xl">No Past Bookings</CardTitle>

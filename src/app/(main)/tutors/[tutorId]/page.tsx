@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, MessageCircle, BookOpen, DollarSign, CalendarDays, Users, Zap, Loader2, Brain } from 'lucide-react';
+import { Star, MessageCircle, BookOpen, CalendarDays, Users, Zap, Loader2, Brain, Handshake } from 'lucide-react'; // Removed DollarSign, Added Handshake
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import BookingForm from '@/components/booking/booking-form';
@@ -28,7 +28,7 @@ export default function TutorProfilePage() {
   const [tutor, setTutor] = useState<Tutor | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { user: currentUser } = useAuth();
-  const [compatibility, setCompatibility] = useState<{ score: number; justification: string } | null>(null);
+  const [compatibility, setCompatibility] =<{ score: number; justification: string } | null>(null);
   const [isLoadingCompatibility, setIsLoadingCompatibility] = useState(false);
 
   useEffect(() => {
@@ -80,6 +80,8 @@ export default function TutorProfilePage() {
       </div>
     );
   }
+  
+  const providesCounseling = tutor.subjectMatterExpertise?.includes('Counseling');
 
   return (
     <div className="container mx-auto max-w-5xl py-8 px-4">
@@ -112,6 +114,12 @@ export default function TutorProfilePage() {
               </InfoSection>
 
               <InfoSection title="Expertise & Teaching">
+                 {providesCounseling && (
+                    <InfoItem icon={Handshake} label="Services Offered">
+                        <Badge variant="secondary" className="mr-1 mb-1 bg-green-100 text-green-700 border-green-300">Counseling Support</Badge>
+                        In addition to academic tutoring.
+                    </InfoItem>
+                )}
                 <InfoItem icon={BookOpen} label="Subjects">
                   {tutor.subjectMatterExpertise && tutor.subjectMatterExpertise.length > 0 
                     ? tutor.subjectMatterExpertise.map(subject => <Badge key={subject} variant="default" className="mr-1 mb-1 bg-primary/80 hover:bg-primary text-primary-foreground">{subject}</Badge>) 
@@ -164,18 +172,15 @@ export default function TutorProfilePage() {
           </Card>
         </div>
 
-        {/* Right Column: Booking & Price */}
+        {/* Right Column: Booking */}
         <div className="md:col-span-1 space-y-8">
           <Card className="shadow-xl sticky top-24">
             <CardHeader>
               <CardTitle className="text-2xl text-center">Book a Session</CardTitle>
-              {tutor.hourlyRate && (
-                <CardDescription className="text-center text-3xl font-bold text-primary pt-2">
-                  <DollarSign className="inline h-7 w-7 mr-1" />
-                  {tutor.hourlyRate}
-                  <span className="text-lg text-muted-foreground"> /hr</span>
+              {/* Hourly rate display removed */}
+               <CardDescription className="text-center text-lg text-muted-foreground pt-2">
+                  All sessions are free.
                 </CardDescription>
-              )}
             </CardHeader>
             <CardContent>
               {currentUser?.role === 'student' ? (
@@ -189,7 +194,7 @@ export default function TutorProfilePage() {
               )}
             </CardContent>
              <CardFooter className="text-xs text-muted-foreground text-center justify-center">
-                Secure payments and easy scheduling.
+                Easy scheduling for tutoring and counseling.
             </CardFooter>
           </Card>
         </div>
@@ -224,4 +229,3 @@ const InfoItem = ({ icon: Icon, label, children }: InfoItemProps) => (
     </div>
   </div>
 );
-

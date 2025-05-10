@@ -6,17 +6,15 @@ import type { Tutor } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import React, { useState, useMemo } from 'react';
-import { Search, ListFilter, X } from 'lucide-react';
+import { Search, ListFilter, X, Users2 } from 'lucide-react'; // Changed Users to Users2
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
-// Get unique subjects from all tutors for filter dropdown
-const allSubjects = Array.from(new Set(mockTutors.flatMap(tutor => tutor.subjectMatterExpertise || [])));
+import { AVAILABLE_SUBJECTS } from '@/lib/constants';
 
 export default function FindTutorsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<string>('rating'); // 'rating', 'price_asc', 'price_desc'
+  const [sortBy, setSortBy] = useState<string>('rating'); // 'rating', 'experience_desc'
 
   const filteredAndSortedTutors = useMemo(() => {
     let tutors = mockTutors.filter(tutor => {
@@ -29,10 +27,8 @@ export default function FindTutorsPage() {
 
     if (sortBy === 'rating') {
       tutors.sort((a, b) => (b.overallRating || 0) - (a.overallRating || 0));
-    } else if (sortBy === 'price_asc') {
-      tutors.sort((a, b) => (a.hourlyRate || Infinity) - (b.hourlyRate || Infinity));
-    } else if (sortBy === 'price_desc') {
-      tutors.sort((a, b) => (b.hourlyRate || 0) - (a.hourlyRate || 0));
+    } else if (sortBy === 'experience_desc') {
+      tutors.sort((a, b) => (b.yearsOfExperience || 0) - (a.yearsOfExperience || 0));
     }
 
     return tutors;
@@ -42,7 +38,7 @@ export default function FindTutorsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Find Your Perfect Tutor</h1>
-        <p className="text-lg text-muted-foreground">Browse our expert tutors and get personalized help.</p>
+        <p className="text-lg text-gray-600">Browse our expert tutors and counselors for personalized help.</p>
       </div>
 
       <Card className="shadow-md">
@@ -65,7 +61,7 @@ export default function FindTutorsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Subjects</SelectItem>
-                {allSubjects.map(subject => (
+                {AVAILABLE_SUBJECTS.map(subject => (
                   <SelectItem key={subject} value={subject}>{subject}</SelectItem>
                 ))}
               </SelectContent>
@@ -76,8 +72,7 @@ export default function FindTutorsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="rating">Sort by Rating</SelectItem>
-                <SelectItem value="price_asc">Price: Low to High</SelectItem>
-                <SelectItem value="price_desc">Price: High to Low</SelectItem>
+                <SelectItem value="experience_desc">Sort by Experience</SelectItem>
               </SelectContent>
             </Select>
             {(searchTerm || selectedSubject) && (
@@ -98,7 +93,7 @@ export default function FindTutorsPage() {
       ) : (
         <Card className="text-center py-12 shadow">
           <CardContent>
-            <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <Users2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" /> {/* Changed Users to Users2 */}
             <h3 className="text-xl font-semibold text-foreground">No Tutors Found</h3>
             <p className="text-muted-foreground mt-2">Try adjusting your search or filters.</p>
             {(searchTerm || selectedSubject) && (

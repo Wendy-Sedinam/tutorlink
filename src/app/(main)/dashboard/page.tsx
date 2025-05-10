@@ -4,14 +4,14 @@ import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, BookOpen, CalendarCheck, Users, Bell } from 'lucide-react';
+import { ArrowRight, BookOpen, CalendarCheck, Users, Bell, CalendarPlus } from 'lucide-react';
 import { mockBookings, mockNotifications } from '@/lib/mock-data';
 import Image from 'next/image';
 
 export default function DashboardPage() {
   const { user } = useAuth();
 
-  if (!user) return null; // Should be handled by layout, but good practice
+  if (!user) return null; 
 
   const upcomingBookings = mockBookings.filter(b => (b.studentId === user.id || b.tutorId === user.id) && new Date(b.dateTime) > new Date() && b.status === 'confirmed').slice(0, 2);
   const unreadNotificationsCount = mockNotifications.filter(n => n.userId === user.id && !n.read).length;
@@ -32,7 +32,7 @@ export default function DashboardPage() {
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">Welcome back, {user.name.split(' ')[0]}!</h1>
             <p className="text-lg text-muted-foreground mt-2">
               {user.role === 'student' 
-                ? "Ready to learn something new today? Let's find your next session." 
+                ? "Ready to learn something new or need to talk? Let's find your next session." 
                 : "Ready to inspire your students? Manage your schedule and requests here."}
             </p>
           </div>
@@ -41,20 +41,30 @@ export default function DashboardPage() {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <DashboardCard
-          title={user.role === 'student' ? "Find a Tutor" : "Manage Students"}
-          description={user.role === 'student' ? "Browse experts and get matched." : "View your student list and requests."}
+          title={user.role === 'student' ? "Find a Tutor/Counselor" : "Manage Students"}
+          description={user.role === 'student' ? "Browse experts for tutoring or counseling." : "View your student list and requests."}
           icon={Users}
-          link={user.role === 'student' ? "/tutors" : "/manage/students"} // Placeholder link for tutors
-          linkLabel={user.role === 'student' ? "Browse Tutors" : "View Students"}
+          link={user.role === 'student' ? "/tutors" : "/manage/students"}
+          linkLabel={user.role === 'student' ? "Browse Experts" : "View Students"}
           color="primary"
         />
+         {user.role === 'student' && (
+          <DashboardCard
+            title="Request a Session"
+            description="Get academic help or counseling support."
+            icon={CalendarPlus}
+            link="/tutors"
+            linkLabel="Find & Request"
+            color="accent"
+          />
+        )}
         <DashboardCard
           title="My Bookings"
           description={`You have ${upcomingBookings.length} upcoming session(s).`}
           icon={CalendarCheck}
           link="/bookings"
           linkLabel="View Bookings"
-          color="accent"
+          color={user.role === 'student' ? "secondary" : "accent"} // Adjusted color based on student having 3rd card now
         />
         <DashboardCard
           title="Notifications"
@@ -62,7 +72,7 @@ export default function DashboardPage() {
           icon={Bell}
           link="/notifications"
           linkLabel="Check Notifications"
-          color="secondary"
+          color="secondary" // Default to secondary if student has 3 cards, or for tutor
           badgeCount={unreadNotificationsCount > 0 ? unreadNotificationsCount : undefined}
         />
       </div>
@@ -94,8 +104,8 @@ export default function DashboardPage() {
       {user.role === 'student' && (
          <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Explore Subjects</CardTitle>
-            <CardDescription>Discover tutors in subjects you're interested in.</CardDescription>
+            <CardTitle>Explore Subjects & Services</CardTitle>
+            <CardDescription>Discover tutors and counselors in areas you're interested in.</CardDescription>
           </CardHeader>
           <CardContent className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
             {(user as any).subjectInterests?.map((interest: string) => (

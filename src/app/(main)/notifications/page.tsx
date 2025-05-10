@@ -57,7 +57,7 @@ export default function NotificationsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Notifications</h1>
-          <p className="text-lg text-muted-foreground">Stay updated with important alerts and messages.</p>
+          <p className="text-lg text-gray-600">Stay updated with important alerts and messages.</p> {/* Changed text-muted-foreground to text-gray-600 */}
         </div>
         {notifications.length > 0 && unreadCount > 0 && (
            <Button variant="outline" onClick={handleMarkAllAsRead}>
@@ -67,7 +67,7 @@ export default function NotificationsPage() {
       </div>
 
       {notifications.length > 0 ? (
-        <Card className="shadow-md">
+        <Card className="shadow-md"> {/* Card has its own dark background, text-muted-foreground is fine here */}
           <CardContent className="p-0">
             <ul className="divide-y divide-border">
               {notifications.map(notification => (
@@ -82,7 +82,7 @@ export default function NotificationsPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="py-16 text-center shadow-sm">
+        <Card className="py-16 text-center shadow-sm"> {/* Card has its own dark background, text-muted-foreground is fine here */}
           <CardHeader>
              <BellRing className="mx-auto h-20 w-20 text-muted-foreground mb-4" />
             <CardTitle className="text-2xl">No Notifications Yet</CardTitle>

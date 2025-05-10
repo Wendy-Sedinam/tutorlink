@@ -35,9 +35,10 @@ export default function MainAppLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background"> {/* Overall page background remains dark */}
       <Header />
-      <main className="flex-grow container mx-auto max-w-screen-2xl px-4 py-8 md:px-8">
+      {/* Main content area changed to white background with dark text */}
+      <main className="flex-grow container mx-auto max-w-screen-2xl px-4 py-8 md:px-8 bg-white text-zinc-900">
         {children}
       </main>
       <footer className="py-6 text-center text-sm text-muted-foreground border-t">

@@ -4,9 +4,9 @@ import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Edit3, Mail, Briefcase, BookOpen, GraduationCap, Users, DollarSign, CalendarDays, Brain, Zap, MessageCircle } from 'lucide-react';
+import { Edit3, Mail, Briefcase, BookOpen, GraduationCap, Users, CalendarDays, Brain, Zap, MessageCircle } from 'lucide-react';
 import React, { useState } from 'react';
-import EditProfileForm from '@/components/user/edit-profile-form'; // Will create this next
+import EditProfileForm from '@/components/user/edit-profile-form'; 
 import type { Student, Tutor } from '@/types';
 import { Badge } from '@/components/ui/badge';
 
@@ -90,7 +90,7 @@ export default function ProfilePage() {
                     } />
                     {tutor.descriptionOfExpertise && <InfoItem icon={Zap} label="Description of Expertise" value={tutor.descriptionOfExpertise} />}
                     {tutor.teachingStyle && <InfoItem icon={MessageCircle} label="Teaching Style" value={tutor.teachingStyle} />}
-                    {tutor.hourlyRate && <InfoItem icon={DollarSign} label="Hourly Rate" value={`$${tutor.hourlyRate}/hr`} />}
+                    {/* {tutor.hourlyRate && <InfoItem icon={DollarSign} label="Hourly Rate" value={`$${tutor.hourlyRate}/hr`} />} Removed */}
                     {tutor.yearsOfExperience !== undefined && <InfoItem icon={CalendarDays} label="Years of Experience" value={`${tutor.yearsOfExperience} years`} />}
                      {/* Display availability if structured */}
                   </InfoSection>
@@ -134,4 +134,3 @@ const InfoItem = ({ icon: Icon, label, value }: InfoItemProps) => (
     </div>
   </div>
 );
-

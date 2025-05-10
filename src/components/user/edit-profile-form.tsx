@@ -21,8 +21,8 @@ import { useState } from "react";
 import { Loader2, Save, Sparkles, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { suggestTags } from "@/ai/flows/suggest-tags-for-profile";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { AVAILABLE_SUBJECTS } from "@/lib/constants";
 
 // Define separate schemas for student and tutor specific fields
 const studentSchemaExtensions = {
@@ -35,7 +35,7 @@ const tutorSchemaExtensions = {
   subjectMatterExpertise: z.array(z.string()).optional(),
   descriptionOfExpertise: z.string().optional(),
   teachingStyle: z.string().optional(),
-  hourlyRate: z.coerce.number().positive().optional(),
+  // hourlyRate: z.coerce.number().positive().optional(), // Removed
   yearsOfExperience: z.coerce.number().int().nonnegative().optional(),
 };
 
@@ -54,8 +54,6 @@ const createFinalSchema = (role: 'student' | 'tutor') => {
   return baseFormSchema.extend(tutorSchemaExtensions);
 };
 
-// Available subjects for multiselect (can be fetched from backend in real app)
-const availableSubjects = ["Mathematics", "Calculus", "Algebra", "Physics", "Chemistry", "Biology", "Computer Science", "Python", "JavaScript", "React", "History", "Literature", "Creative Writing", "Essay Writing", "Grammar", "Statistics"];
 
 interface EditProfileFormProps {
   user: User;
@@ -90,7 +88,7 @@ export default function EditProfileForm({ user, onSave, onCancel }: EditProfileF
         subjectMatterExpertise: tutor.subjectMatterExpertise || [],
         descriptionOfExpertise: tutor.descriptionOfExpertise || "",
         teachingStyle: tutor.teachingStyle || "",
-        hourlyRate: tutor.hourlyRate || undefined,
+        // hourlyRate: tutor.hourlyRate || undefined, // Removed
         yearsOfExperience: tutor.yearsOfExperience || undefined,
       }),
     },
@@ -111,20 +109,12 @@ export default function EditProfileForm({ user, onSave, onCancel }: EditProfileF
       try {
         const result = await suggestTags({ expertiseDescription: description });
         const currentTags = form.getValues("subjectMatterExpertise" as keyof FormValues) as string[] || [];
-        const newSuggestedTags = result.suggestedTags.filter(tag => !currentTags.includes(tag));
         
-        if(newSuggestedTags.length > 0) {
-             // Filter suggested tags to only include those from availableSubjects or add them if not present
-            const validNewTags = newSuggestedTags.filter(tag => {
-                if (!availableSubjects.includes(tag)) {
-                    // This logic is simplified. In a real app, you might allow adding new tags
-                    // or have a more robust tag management system.
-                    // For now, we'll just log it or you could add it to availableSubjects dynamically (not recommended for mock)
-                    console.warn(`Suggested tag "${tag}" is not in the predefined list and will be ignored for selection.`)
-                    return false;
-                }
-                return true;
-            });
+        const validNewTags = result.suggestedTags.filter(tag => 
+          !currentTags.includes(tag) && AVAILABLE_SUBJECTS.includes(tag)
+        );
+            
+        if(validNewTags.length > 0) {
             form.setValue("subjectMatterExpertise" as keyof FormValues, [...currentTags, ...validNewTags] as any);
             toast({
                 title: "Tags Suggested!",
@@ -132,13 +122,13 @@ export default function EditProfileForm({ user, onSave, onCancel }: EditProfileF
             });
         } else if (result.suggestedTags.length > 0) {
              toast({
-                title: "Tags Already Present",
-                description: "Suggested tags are already in your expertise list or not in predefined list.",
+                title: "Tags Status",
+                description: "Suggested tags are already in your expertise list or not in predefined available subjects.",
             });
         } else {
              toast({
                 title: "No New Tags Suggested",
-                description: "Could not find new relevant tags.",
+                description: "Could not find new relevant tags from the available subjects list.",
             });
         }
 
@@ -236,11 +226,11 @@ export default function EditProfileForm({ user, onSave, onCancel }: EditProfileF
             <FormField
               control={form.control}
               name="subjectInterests"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Subject Interests</FormLabel>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {availableSubjects.map((subject) => (
+                    {AVAILABLE_SUBJECTS.map((subject) => (
                       <FormField
                         key={subject}
                         control={form.control}
@@ -323,7 +313,7 @@ export default function EditProfileForm({ user, onSave, onCancel }: EditProfileF
                 <FormItem>
                   <FormLabel>Subject Matter Expertise (Tags)</FormLabel>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {availableSubjects.map((subject) => (
+                  {AVAILABLE_SUBJECTS.map((subject) => (
                       <FormField
                         key={subject}
                         control={form.control}
@@ -375,20 +365,6 @@ export default function EditProfileForm({ user, onSave, onCancel }: EditProfileF
                 </FormItem>
               )}
             />
-            <div className="grid md:grid-cols-2 gap-8">
-            <FormField
-              control={form.control}
-              name="hourlyRate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hourly Rate ($)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="50" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="yearsOfExperience"
@@ -402,7 +378,6 @@ export default function EditProfileForm({ user, onSave, onCancel }: EditProfileF
                 </FormItem>
               )}
             />
-            </div>
           </>
         )}
 

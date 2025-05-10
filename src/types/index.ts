@@ -16,10 +16,10 @@ export interface Student extends User {
 export interface Tutor extends User {
   role: 'tutor';
   headline?: string; // e.g., "Expert Math Tutor for High School Students"
-  subjectMatterExpertise?: string[]; // Detailed list of expertise for matching and display, e.g. ["Calculus", "Algebra", "Differential Equations"]
+  subjectMatterExpertise?: string[]; // Detailed list of expertise for matching and display, e.g. ["Calculus", "Algebra", "Counseling"]
   descriptionOfExpertise?: string; // A paragraph form description for AI tag suggestion
   teachingStyle?: string; // e.g. "Patient and visual", "Interactive problem solving"
-  hourlyRate?: number;
+  // hourlyRate?: number; // Removed as services are free
   availability?: { day: string; timeSlots: string[] }[]; // e.g. [{ day: "Monday", timeSlots: ["10:00-11:00", "14:00-15:00"] }]
   overallRating?: number; // 0-5
   reviewsCount?: number;
