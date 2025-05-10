@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
 interface StudentDisplayInfo extends Student {
-  lastBookingSubject?: string;
+  lastBookingReasonForSession?: string; // Changed from lastBookingSubject
   lastBookingDate?: string;
 }
 
@@ -38,7 +38,7 @@ export default function ManageStudentsPage() {
 
       return {
         ...studentDetails,
-        lastBookingSubject: lastBooking?.subject,
+        lastBookingReasonForSession: lastBooking?.reasonForSession, // Changed from lastBooking?.subject
         lastBookingDate: lastBooking ? new Date(lastBooking.dateTime).toLocaleDateString() : undefined,
       };
     }).filter(Boolean) as StudentDisplayInfo[];
@@ -108,10 +108,10 @@ function StudentInfoCard({ student }: StudentInfoCardProps) {
             </div>
           </div>
         )}
-         {student.lastBookingSubject && student.lastBookingDate && (
+         {student.lastBookingReasonForSession && student.lastBookingDate && ( // Changed from student.lastBookingSubject
           <div className="text-sm">
              <p className="font-medium text-foreground mb-1 flex items-center"><CalendarCheck className="h-4 w-4 mr-2 text-accent" />Last Session (with you):</p>
-            <p className="text-muted-foreground">{student.lastBookingSubject} on {student.lastBookingDate}</p>
+            <p className="text-muted-foreground">{student.lastBookingReasonForSession} on {student.lastBookingDate}</p>
           </div>
         )}
          {!student.lastBookingDate && (
@@ -136,4 +136,3 @@ function StudentInfoCard({ student }: StudentInfoCardProps) {
     </Card>
   );
 }
-

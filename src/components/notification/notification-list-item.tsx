@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNowStrict } from 'date-fns';
-import { Bell, CalendarClock, CheckCircle2, Users, AlertCircle, MailCheck, Trash2 } from 'lucide-react';
+import { Bell, CalendarClock, CheckCircle2, Users, AlertCircle, MailCheck, Trash2, CalendarPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NotificationListItemProps {
@@ -16,16 +16,20 @@ interface NotificationListItemProps {
 
 const typeIcons: { [key in AppNotification['type']]: React.ElementType } = {
   reminder: CalendarClock,
-  confirmation: CheckCircle2,
+  confirmation: CheckCircle2, // General confirmation
   match_update: Users,
   generic: Bell,
+  booking_request: CalendarPlus,
+  booking_confirmed: CheckCircle2,
 };
 
 const typeColors: { [key in AppNotification['type']]: string } = {
   reminder: 'text-yellow-500 bg-yellow-500/10',
-  confirmation: 'text-green-500 bg-green-500/10',
+  confirmation: 'text-green-500 bg-green-500/10', // General confirmation
   match_update: 'text-blue-500 bg-blue-500/10',
   generic: 'text-gray-500 bg-gray-500/10',
+  booking_request: 'text-blue-500 bg-blue-500/10', // Same as match_update for visual consistency
+  booking_confirmed: 'text-green-500 bg-green-500/10', // Same as confirmation
 }
 
 export default function NotificationListItem({ notification, onMarkAsRead, onDelete }: NotificationListItemProps) {

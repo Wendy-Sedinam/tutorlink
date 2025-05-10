@@ -71,7 +71,7 @@ export default function DashboardPage() {
             title="Request a Session"
             description="Get academic help or counseling support."
             icon={CalendarPlus}
-            link="/tutors" // Link to find tutors page, booking is done from tutor's profile
+            link="/tutors" 
             linkLabel="Find & Request"
             color="accent"
           />
@@ -105,7 +105,7 @@ export default function DashboardPage() {
             {upcomingBookings.map(booking => (
               <div key={booking.id} className="p-4 border rounded-lg flex justify-between items-center bg-background hover:bg-muted/30 transition-colors">
                 <div>
-                  <h3 className="font-semibold text-foreground">{booking.subject}</h3>
+                  <h3 className="font-semibold text-foreground">{booking.reasonForSession}</h3>
                   <p className="text-sm text-muted-foreground">
                     With {user.role === 'student' ? booking.tutorName : booking.studentName} on {new Date(booking.dateTime).toLocaleDateString()} at {new Date(booking.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
@@ -187,4 +187,3 @@ function DashboardCard({ title, description, icon: Icon, link, linkLabel, color,
     </Card>
   )
 }
-

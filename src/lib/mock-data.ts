@@ -37,7 +37,6 @@ export const mockTutors: Tutor[] = [
     subjectMatterExpertise: ['Calculus', 'Algebra', 'Statistics', 'Differential Equations', 'Counseling'],
     descriptionOfExpertise: 'I specialize in advanced mathematics, including calculus, linear algebra, and statistics. My goal is to help students build a strong foundational understanding and problem-solving skills. I also provide academic counseling to help students navigate their studies.',
     teachingStyle: 'Patient, concept-focused, with real-world applications.',
-    // hourlyRate: 75, // Removed
     availability: [
       { day: 'Monday', timeSlots: ['10:00-12:00', '14:00-16:00'] },
       { day: 'Wednesday', timeSlots: ['09:00-11:00', '13:00-15:00'] },
@@ -45,7 +44,7 @@ export const mockTutors: Tutor[] = [
     overallRating: 4.9,
     reviewsCount: 120,
     yearsOfExperience: 10,
-    assignedStudentIds: [],
+    assignedStudentIds: ['student1'], // Assign student1 to tutor1
   },
   {
     id: 'tutor2',
@@ -58,7 +57,6 @@ export const mockTutors: Tutor[] = [
     subjectMatterExpertise: ['Python', 'JavaScript', 'React', 'Computer Science'],
     descriptionOfExpertise: 'I am a full-stack developer with expertise in Python and JavaScript frameworks like React and Node.js. I enjoy teaching data structures and algorithms, and helping students build cool projects.',
     teachingStyle: 'Hands-on, project-based learning, encouraging experimentation.',
-    // hourlyRate: 60, // Removed
     availability: [
       { day: 'Tuesday', timeSlots: ['18:00-21:00'] },
       { day: 'Thursday', timeSlots: ['18:00-21:00'] },
@@ -67,7 +65,7 @@ export const mockTutors: Tutor[] = [
     overallRating: 4.7,
     reviewsCount: 85,
     yearsOfExperience: 5,
-    assignedStudentIds: [],
+    assignedStudentIds: ['student2'], // Assign student2 to tutor2
   },
   {
     id: 'tutor3',
@@ -80,7 +78,6 @@ export const mockTutors: Tutor[] = [
     subjectMatterExpertise: ['Essay Writing', 'Literature', 'Creative Writing', 'Grammar', 'Counseling'],
     descriptionOfExpertise: 'I help students unlock their potential in writing. From structuring compelling essays to analyzing complex literary texts and fostering creative expression, I provide tailored guidance. I also offer counseling sessions for students needing support with academic stress and study habits.',
     teachingStyle: 'Encouraging, feedback-oriented, focusing on critical thinking and clarity.',
-    // hourlyRate: 50, // Removed
     availability: [
       { day: 'Monday', timeSlots: ['15:00-18:00'] },
       { day: 'Friday', timeSlots: ['10:00-13:00'] },
@@ -101,7 +98,7 @@ export const mockBookings: Booking[] = [
     tutorName: 'Dr. Elara Vance',
     dateTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
     durationMinutes: 60,
-    subject: 'Calculus',
+    reasonForSession: 'Calculus Problem Solving', // Changed from subject
     status: 'confirmed',
     meetingLink: 'https://meet.example.com/calculus-session',
   },
@@ -113,7 +110,7 @@ export const mockBookings: Booking[] = [
     tutorName: 'Marcus Chen',
     dateTime: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
     durationMinutes: 90,
-    subject: 'Python',
+    reasonForSession: 'Python Project Help', // Changed from subject
     status: 'pending',
   },
   {
@@ -124,7 +121,7 @@ export const mockBookings: Booking[] = [
     tutorName: 'Sophia Lorenza',
     dateTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
     durationMinutes: 45,
-    subject: 'Counseling',
+    reasonForSession: 'Counseling for Academic Stress', // Changed from subject
     status: 'completed',
   },
 ];
@@ -143,9 +140,9 @@ export const mockNotifications: AppNotification[] = [
   {
     id: 'notif2',
     userId: 'tutor2',
-    title: 'New Booking Request',
-    message: 'Bob The Builder has requested a Python programming session.',
-    type: 'confirmation',
+    title: 'New Session Request', // Changed title for clarity
+    message: 'Bob The Builder has requested a Python Project Help session.',
+    type: 'booking_request', // Changed type
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
     read: true,
     link: '/bookings#booking2',
