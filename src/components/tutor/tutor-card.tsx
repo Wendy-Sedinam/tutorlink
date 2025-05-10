@@ -3,14 +3,15 @@
 import type { Tutor, Student, CompatibilityScoreInfo } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Star, Zap, MessageCircle, BookOpen, Loader2 } from 'lucide-react'; // Removed DollarSign
+import { Star, Zap, MessageCircle, BookOpen, Loader2 } from 'lucide-react'; 
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { generateCompatibilityScore } from '@/ai/flows/generate-compatibility-score';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
+import { buttonVariants } from "@/components/ui/button"; // Added import
+import { cn } from "@/lib/utils"; // Added import for cn if not already present
 
 interface TutorCardProps {
   tutor: Tutor;
@@ -109,11 +110,13 @@ export default function TutorCard({ tutor }: TutorCardProps) {
         )}
       </CardContent>
       <CardFooter className="p-4 border-t bg-muted/20 flex items-center justify-between">
-        {/* Hourly rate display removed */}
         <span className="text-sm text-muted-foreground">Services are free</span>
-        <Button asChild variant="default" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-          <Link href={`/tutors/${tutor.id}`}>View Profile</Link>
-        </Button>
+        <Link 
+          href={`/tutors/${tutor.id}`} 
+          className={cn(buttonVariants({ variant: "default" }))}
+        >
+          View Profile
+        </Link>
       </CardFooter>
     </Card>
   );
