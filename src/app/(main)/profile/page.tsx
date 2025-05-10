@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Edit3, Mail, Briefcase, BookOpen, GraduationCap, Users, DollarSign, CalendarDays, Brain, Zap } from 'lucide-react';
+import { Edit3, Mail, Briefcase, BookOpen, GraduationCap, Users, DollarSign, CalendarDays, Brain, Zap, MessageCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import EditProfileForm from '@/components/user/edit-profile-form'; // Will create this next
 import type { Student, Tutor } from '@/types';

@@ -2,6 +2,7 @@ import SignupForm from '@/components/auth/signup-form';
 import Logo from '@/components/shared/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function SignupPage() {
   return (
