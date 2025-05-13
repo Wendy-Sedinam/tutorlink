@@ -98,7 +98,6 @@ export const mockBookings: Booking[] = [
     tutorName: 'Dr. Elara Vance',
     dateTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
     durationMinutes: 60,
-    reasonForSession: 'Calculus Problem Solving', // Changed from subject
     status: 'confirmed',
     meetingLink: 'https://meet.example.com/calculus-session',
   },
@@ -110,7 +109,6 @@ export const mockBookings: Booking[] = [
     tutorName: 'Marcus Chen',
     dateTime: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
     durationMinutes: 90,
-    reasonForSession: 'Python Project Help', // Changed from subject
     status: 'pending',
   },
   {
@@ -121,7 +119,6 @@ export const mockBookings: Booking[] = [
     tutorName: 'Sophia Lorenza',
     dateTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
     durationMinutes: 45,
-    reasonForSession: 'Counseling for Academic Stress', // Changed from subject
     status: 'completed',
   },
 ];
@@ -131,7 +128,7 @@ export const mockNotifications: AppNotification[] = [
     id: 'notif1',
     userId: 'student1',
     title: 'Meeting Reminder',
-    message: 'Your calculus session with Dr. Elara Vance is tomorrow at 10:00 AM.',
+    message: 'Your session with Dr. Elara Vance is tomorrow at 10:00 AM.',
     type: 'reminder',
     createdAt: new Date().toISOString(),
     read: false,
@@ -140,9 +137,9 @@ export const mockNotifications: AppNotification[] = [
   {
     id: 'notif2',
     userId: 'tutor2',
-    title: 'New Session Request', // Changed title for clarity
-    message: 'Bob The Builder has requested a Python Project Help session.',
-    type: 'booking_request', // Changed type
+    title: 'New Session Request', 
+    message: 'Bob The Builder has requested a session.',
+    type: 'booking_request', 
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
     read: true,
     link: '/bookings#booking2',
@@ -206,3 +203,4 @@ export const mockChatMessages: ChatMessage[] = [
     read: false, // Tutor hasn't read
   }
 ];
+

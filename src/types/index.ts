@@ -34,7 +34,6 @@ export interface Booking {
   tutorName: string;
   dateTime: string; // ISO string format for date and time
   durationMinutes: number;
-  reasonForSession: string; // Changed from subject
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   meetingLink?: string; // e.g. Zoom or Google Meet link
   notes?: string; // Optional notes from student
@@ -75,3 +74,4 @@ export interface Conversation {
   lastMessage?: ChatMessage;
   unreadCount: number;
 }
+

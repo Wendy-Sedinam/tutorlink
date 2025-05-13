@@ -12,7 +12,7 @@ export default function LoginPage() {
       </div>
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">Welcome Back!</CardTitle>
+          <CardTitle className="text-3xl font-bold">Welcome!</CardTitle>
           <CardDescription>Sign in to continue your learning journey with TutorLink.</CardDescription>
         </CardHeader>
         <CardContent>

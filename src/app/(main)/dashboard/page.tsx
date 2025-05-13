@@ -105,9 +105,9 @@ export default function DashboardPage() {
             {upcomingBookings.map(booking => (
               <div key={booking.id} className="p-4 border rounded-lg flex justify-between items-center bg-background hover:bg-muted/30 transition-colors">
                 <div>
-                  <h3 className="font-semibold text-foreground">{booking.reasonForSession}</h3>
+                  <h3 className="font-semibold text-foreground">Session with {user.role === 'student' ? booking.tutorName : booking.studentName}</h3>
                   <p className="text-sm text-muted-foreground">
-                    With {user.role === 'student' ? booking.tutorName : booking.studentName} on {new Date(booking.dateTime).toLocaleDateString()} at {new Date(booking.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    On {new Date(booking.dateTime).toLocaleDateString()} at {new Date(booking.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
                 <Button variant="outline" size="sm" asChild>
@@ -155,7 +155,7 @@ function DashboardCard({ title, description, icon: Icon, link, linkLabel, color,
   const colorClasses = {
     primary: "border-primary/30 hover:border-primary/50 text-primary",
     accent: "border-accent/30 hover:border-accent/50 text-accent",
-    secondary: "border-secondary/30 hover:border-secondary/50 text-secondary-foreground",
+    secondary: "border-secondary/30 hover:border-secondary/50 text-foreground", // Changed from text-secondary-foreground
   }
   const buttonColorClasses = {
     primary: "bg-primary hover:bg-primary/90 text-primary-foreground",
@@ -166,13 +166,13 @@ function DashboardCard({ title, description, icon: Icon, link, linkLabel, color,
   return (
     <Card className={`shadow-lg hover:shadow-xl transition-shadow duration-300 border ${colorClasses[color]}`}>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-        <div className={`p-2 rounded-full bg-${color}/10`}>
-          <Icon className={`h-6 w-6 text-${color}`} />
+        <CardTitle className="text-lg font-semibold">{title}</CardTitle> {/* Uses card-foreground by default, which is white */}
+        <div className={`p-2 rounded-full bg-${color}/10`}> {/* Icon background uses color with opacity */}
+          <Icon className={`h-6 w-6 text-${color}`} /> {/* Icon itself uses the direct color (primary, accent, secondary) */}
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground mb-4">{description}</p>
+        <p className="text-sm text-muted-foreground mb-4">{description}</p> {/* Muted foreground for description */}
         <Button asChild className={`${buttonColorClasses[color]} w-full relative`}>
           <Link href={link}>
             {linkLabel} <ArrowRight className="ml-2 h-4 w-4" />

@@ -5,7 +5,7 @@ import type { Booking, AppNotification } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Clock, BookOpen, Video, XCircle, CheckCircle, AlertCircle, Check, LinkIcon } from 'lucide-react';
+import { CalendarDays, Clock, Video, XCircle, CheckCircle, AlertCircle, Check, LinkIcon } from 'lucide-react';
 import { format, formatDistanceToNowStrict } from 'date-fns';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -43,6 +43,10 @@ export default function BookingCard({ booking: initialBooking, currentUserRole }
     setBooking(initialBooking);
   }, [initialBooking]);
 
+  const otherPartyName = currentUserRole === 'student' ? booking.tutorName : booking.studentName;
+  const otherPartyRole = currentUserRole === 'student' ? 'Tutor' : 'Student';
+  const otherPartyId = currentUserRole === 'student' ? booking.tutorId : booking.studentId;
+
 
   const handleCancelBooking = () => {
     const bookingIndex = mockBookings.findIndex(b => b.id === booking.id);
@@ -51,7 +55,7 @@ export default function BookingCard({ booking: initialBooking, currentUserRole }
       setBooking(prev => ({...prev, status: 'cancelled'})); 
       toast({
         title: 'Booking Cancelled',
-        description: `Your session for "${booking.reasonForSession}" has been cancelled.`,
+        description: `Your session with ${otherPartyName} has been cancelled.`,
         variant: 'destructive'
       });
     }
@@ -67,7 +71,7 @@ export default function BookingCard({ booking: initialBooking, currentUserRole }
         id: `notif-student-${Date.now()}`,
         userId: booking.studentId,
         title: "Session Confirmed!",
-        message: `Your session for "${booking.reasonForSession}" with ${booking.tutorName} on ${format(new Date(booking.dateTime), "MMM d, yyyy 'at' p")} has been confirmed.`,
+        message: `Your session with ${booking.tutorName} on ${format(new Date(booking.dateTime), "MMM d, yyyy 'at' p")} has been confirmed.`,
         type: 'booking_confirmed',
         createdAt: new Date().toISOString(),
         read: false,
@@ -77,7 +81,7 @@ export default function BookingCard({ booking: initialBooking, currentUserRole }
       
       toast({
         title: 'Booking Confirmed',
-        description: `Session for "${booking.reasonForSession}" confirmed. Student ${booking.studentName} will be notified.`,
+        description: `Session with student ${booking.studentName} confirmed. The student will be notified.`,
         variant: 'default'
       });
     }
@@ -97,7 +101,7 @@ export default function BookingCard({ booking: initialBooking, currentUserRole }
         id: `notif-link-${Date.now()}`,
         userId: booking.studentId,
         title: "Session Link Updated",
-        message: `The meeting link for your session "${booking.reasonForSession}" with ${booking.tutorName} has been updated.`,
+        message: `The meeting link for your session with ${booking.tutorName} has been updated.`,
         type: 'confirmation',
         createdAt: new Date().toISOString(),
         read: false,
@@ -107,10 +111,6 @@ export default function BookingCard({ booking: initialBooking, currentUserRole }
     }
   };
   
-  const otherPartyName = currentUserRole === 'student' ? booking.tutorName : booking.studentName;
-  const otherPartyRole = currentUserRole === 'student' ? 'Tutor' : 'Student';
-  const otherPartyId = currentUserRole === 'student' ? booking.tutorId : booking.studentId;
-
   const bookingDate = new Date(booking.dateTime);
   const isPast = bookingDate < new Date();
   const StatusIcon = statusIcons[booking.status];
@@ -122,7 +122,7 @@ export default function BookingCard({ booking: initialBooking, currentUserRole }
         <CardHeader className="pb-4 border-b">
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="text-xl font-semibold text-primary">{booking.reasonForSession}</CardTitle>
+              <CardTitle className="text-xl font-semibold text-primary">Session Details</CardTitle>
               <CardDescription className="text-sm text-muted-foreground">
                 With <Link href={`/${otherPartyRole.toLowerCase()}s/${otherPartyId}`} className="text-accent hover:underline font-medium">{otherPartyName}</Link> ({otherPartyRole})
               </CardDescription>
@@ -133,10 +133,6 @@ export default function BookingCard({ booking: initialBooking, currentUserRole }
           </div>
         </CardHeader>
         <CardContent className="py-4 space-y-3 flex-grow">
-          <div className="flex items-center text-sm">
-            <BookOpen className="h-4 w-4 mr-2 text-muted-foreground" />
-            <span className="font-medium text-foreground mr-1">Reason:</span> {booking.reasonForSession}
-          </div>
           <div className="flex items-center text-sm">
             <CalendarDays className="h-4 w-4 mr-2 text-muted-foreground" />
             <span className="font-medium text-foreground mr-1">Date:</span> {format(bookingDate, "EEE, MMM d, yyyy")}

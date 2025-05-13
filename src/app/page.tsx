@@ -15,7 +15,7 @@ export default function HomePage() {
               <Link href="/login">Login</Link>
             </Button>
             <Button asChild className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-md hover:shadow-lg transition-shadow">
-              <Link href="/signup">Get Started <ArrowRight className="ml-2 h-4 w-4"/></Link>
+              <Link href="/signup">Sign Up <ArrowRight className="ml-2 h-4 w-4"/></Link>
             </Button>
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function HomePage() {
             </p>
             <Button size="lg" asChild className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
               <Link href="/signup">
-                Sign Up for Free <ArrowRight className="ml-2 h-5 w-5"/>
+                Sign Up <ArrowRight className="ml-2 h-5 w-5"/>
               </Link>
             </Button>
           </div>

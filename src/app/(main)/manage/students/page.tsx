@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { mockBookings, mockStudents, mockTutors, generateChatId } from '@/lib/mock-data';
-import type { Student, Tutor } from '@/types';
+import type { Student } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Mail, Users, BookOpen, CalendarCheck, MessageSquare } from 'lucide-react';
@@ -12,7 +12,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 interface StudentDisplayInfo extends Student {
-  lastBookingReasonForSession?: string; 
   lastBookingDate?: string;
 }
 
@@ -39,7 +38,6 @@ export default function ManageStudentsPage() {
 
       return {
         ...studentDetails,
-        lastBookingReasonForSession: lastBooking?.reasonForSession,
         lastBookingDate: lastBooking ? new Date(lastBooking.dateTime).toLocaleDateString() : undefined,
       };
     }).filter(Boolean) as StudentDisplayInfo[];
@@ -111,10 +109,10 @@ function StudentInfoCard({ student, tutorId }: StudentInfoCardProps) {
             </div>
           </div>
         )}
-         {student.lastBookingReasonForSession && student.lastBookingDate && ( 
+         {student.lastBookingDate && ( 
           <div className="text-sm">
              <p className="font-medium text-foreground mb-1 flex items-center"><CalendarCheck className="h-4 w-4 mr-2 text-accent" />Last Session (with you):</p>
-            <p className="text-muted-foreground">{student.lastBookingReasonForSession} on {student.lastBookingDate}</p>
+            <p className="text-muted-foreground">On {student.lastBookingDate}</p>
           </div>
         )}
          {!student.lastBookingDate && (

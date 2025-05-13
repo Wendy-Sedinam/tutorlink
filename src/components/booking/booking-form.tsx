@@ -33,7 +33,6 @@ import { mockBookings, mockNotifications } from "@/lib/mock-data"; // To add the
 import { useRouter } from "next/navigation";
 
 const bookingFormSchema = z.object({
-  reasonForSession: z.string({required_error: "Please select a reason for the session."}),
   date: z.date({ required_error: "Please select a date for the session." }),
   timeSlot: z.string({ required_error: "Please select a time slot."}),
   durationMinutes: z.coerce.number().min(30, "Duration must be at least 30 minutes.").max(240, "Duration cannot exceed 4 hours."),
@@ -68,7 +67,6 @@ export default function BookingForm({ tutor, student }: BookingFormProps) {
   const form = useForm<z.infer<typeof bookingFormSchema>>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
-      reasonForSession: tutor.subjectMatterExpertise?.[0] || "",
       durationMinutes: 60,
       notes: "",
     },
@@ -108,7 +106,6 @@ export default function BookingForm({ tutor, student }: BookingFormProps) {
       tutorName: tutor.name,
       dateTime: bookingDateTime.toISOString(),
       durationMinutes: values.durationMinutes,
-      reasonForSession: values.reasonForSession,
       status: "pending", 
       notes: values.notes,
     };
@@ -120,7 +117,7 @@ export default function BookingForm({ tutor, student }: BookingFormProps) {
       id: `notif-tutor-${Date.now()}`,
       userId: tutor.id,
       title: "New Session Request",
-      message: `${student.name} requested a session for "${newBooking.reasonForSession}".`,
+      message: `${student.name} requested a session.`,
       type: 'booking_request',
       createdAt: new Date().toISOString(),
       read: false,
@@ -130,7 +127,7 @@ export default function BookingForm({ tutor, student }: BookingFormProps) {
 
     toast({
       title: "Booking Request Sent!",
-      description: `Your request for a session on ${values.reasonForSession} with ${tutor.name} has been sent. The tutor will be notified.`,
+      description: `Your request for a session with ${tutor.name} has been sent. The tutor will be notified.`,
       variant: "default"
     });
     setIsLoading(false);
@@ -143,29 +140,6 @@ export default function BookingForm({ tutor, student }: BookingFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="reasonForSession"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Reason for Session</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a reason/subject" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {tutor.subjectMatterExpertise?.map(subject => (
-                    <SelectItem key={subject} value={subject}>{subject}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={form.control}
           name="date"
