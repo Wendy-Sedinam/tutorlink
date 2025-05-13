@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { AppNotification } from '@/types';
@@ -10,7 +11,6 @@ import { cn } from '@/lib/utils';
 
 interface NotificationListItemProps {
   notification: AppNotification;
-  onMarkAsRead: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
@@ -32,42 +32,41 @@ const typeColors: { [key in AppNotification['type']]: string } = {
   booking_confirmed: 'text-green-500 bg-green-500/10', // Same as confirmation
 }
 
-export default function NotificationListItem({ notification, onMarkAsRead, onDelete }: NotificationListItemProps) {
+export default function NotificationListItem({ notification, onDelete }: NotificationListItemProps) {
   const Icon = typeIcons[notification.type] || AlertCircle;
   const colorClass = typeColors[notification.type] || typeColors.generic;
 
+  // Since notifications are marked read on page load, the "unread" visual indicators are less prominent or removed.
+  // The `!notification.read` checks here might still be useful if the page state doesn't update immediately,
+  // but the primary logic for marking read is now in the parent page.
   const content = (
-    <div className={cn("flex items-start gap-4 p-4 hover:bg-muted/30 transition-colors", !notification.read && "bg-primary/5")}>
+    <div className={cn("flex items-start gap-4 p-4 hover:bg-muted/30 transition-colors")}>
       <div className={cn("p-2 rounded-full", colorClass)}>
         <Icon className="h-5 w-5" />
       </div>
       <div className="flex-grow">
         <div className="flex justify-between items-start mb-0.5">
-           <h3 className={cn("font-semibold text-foreground", !notification.read && "text-primary")}>{notification.title}</h3>
+           <h3 className={cn("font-semibold text-foreground")}>{notification.title}</h3>
            <span className="text-xs text-muted-foreground whitespace-nowrap">
             {formatDistanceToNowStrict(new Date(notification.createdAt), { addSuffix: true })}
           </span>
         </div>
         <p className="text-sm text-muted-foreground mb-2">{notification.message}</p>
         <div className="flex items-center gap-2 mt-1">
-          {!notification.read && (
-            <Button variant="ghost" size="sm" onClick={() => onMarkAsRead(notification.id)} className="text-xs h-7 px-2 text-primary hover:bg-primary/10">
-              <MailCheck className="mr-1 h-3 w-3" /> Mark as Read
-            </Button>
-          )}
           <Button variant="ghost" size="sm" onClick={() => onDelete(notification.id)} className="text-xs h-7 px-2 text-destructive hover:bg-destructive/10">
              <Trash2 className="mr-1 h-3 w-3" /> Delete
           </Button>
         </div>
       </div>
-      {!notification.read && (
+      {/* Optionally, keep a subtle indicator if truly unread before page effect, or remove if always read */}
+      {/* {!notification.read && (
         <div className="w-2.5 h-2.5 bg-accent rounded-full self-center shrink-0" aria-label="Unread notification"></div>
-      )}
+      )} */}
     </div>
   );
 
   return (
-    <li className={cn(!notification.read && "font-semibold")}>
+    <li>
       {notification.link ? (
         <Link href={notification.link} className="block">
           {content}
@@ -78,3 +77,4 @@ export default function NotificationListItem({ notification, onMarkAsRead, onDel
     </li>
   );
 }
+

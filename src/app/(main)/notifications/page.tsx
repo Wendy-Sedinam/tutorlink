@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAuth } from '@/hooks/use-auth';
@@ -6,7 +7,7 @@ import type { AppNotification } from '@/types';
 import NotificationListItem from '@/components/notification/notification-list-item';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BellRing, CheckCheck, Trash2 } from 'lucide-react';
+import { BellRing, Trash2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 export default function NotificationsPage() {
@@ -15,28 +16,23 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (user) {
-      const userNotifications = mockNotifications
+      const updatedNotifications = mockNotifications
         .filter(n => n.userId === user.id)
+        .map(n => {
+          if (!n.read) {
+            // Update mockNotifications directly for persistence during session
+            const mockIndex = mockNotifications.findIndex(mockN => mockN.id === n.id);
+            if (mockIndex !== -1) {
+              mockNotifications[mockIndex].read = true;
+            }
+            return { ...n, read: true }; // Return the updated notification for local state
+          }
+          return n;
+        })
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      setNotifications(userNotifications);
+      setNotifications(updatedNotifications);
     }
   }, [user]);
-
-  const handleMarkAsRead = (notificationId: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
-    );
-    // In real app, also update mockNotifications or backend
-    const mockIndex = mockNotifications.findIndex(n => n.id === notificationId);
-    if (mockIndex !== -1) mockNotifications[mockIndex].read = true;
-  };
-
-  const handleMarkAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    mockNotifications.forEach(n => {
-      if (n.userId === user?.id) n.read = true;
-    });
-  };
   
   const handleDeleteNotification = (notificationId: string) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
@@ -50,31 +46,23 @@ export default function NotificationsPage() {
     return <p className="text-center py-10">Please log in to view your notifications.</p>;
   }
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Notifications</h1>
-          <p className="text-lg text-gray-600">Stay updated with important alerts and messages.</p> {/* Changed text-muted-foreground to text-gray-600 */}
+          <p className="text-lg text-gray-600">Stay updated with important alerts and messages.</p>
         </div>
-        {notifications.length > 0 && unreadCount > 0 && (
-           <Button variant="outline" onClick={handleMarkAllAsRead}>
-             <CheckCheck className="mr-2 h-4 w-4"/> Mark all as read
-           </Button>
-        )}
       </div>
 
       {notifications.length > 0 ? (
-        <Card className="shadow-md"> {/* Card has its own dark background, text-muted-foreground is fine here */}
+        <Card className="shadow-md">
           <CardContent className="p-0">
             <ul className="divide-y divide-border">
               {notifications.map(notification => (
                 <NotificationListItem 
                   key={notification.id} 
                   notification={notification} 
-                  onMarkAsRead={handleMarkAsRead}
                   onDelete={handleDeleteNotification}
                 />
               ))}
@@ -82,7 +70,7 @@ export default function NotificationsPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="py-16 text-center shadow-sm"> {/* Card has its own dark background, text-muted-foreground is fine here */}
+        <Card className="py-16 text-center shadow-sm">
           <CardHeader>
              <BellRing className="mx-auto h-20 w-20 text-muted-foreground mb-4" />
             <CardTitle className="text-2xl">No Notifications Yet</CardTitle>
@@ -97,3 +85,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+
