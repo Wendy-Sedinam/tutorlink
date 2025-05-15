@@ -1,3 +1,4 @@
+
 "use client";
 
 import TutorCard from '@/components/tutor/tutor-card';
@@ -5,8 +6,8 @@ import { mockTutors } from '@/lib/mock-data';
 import type { Tutor } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import React, { useState, useMemo } from 'react';
-import { Search, ListFilter, X, Users2 } from 'lucide-react'; // Changed Users to Users2
+import React, { useState } from 'react'; // Removed useMemo
+import { Search, ListFilter, X, Users2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AVAILABLE_SUBJECTS } from '@/lib/constants';
@@ -16,23 +17,22 @@ export default function FindTutorsPage() {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('rating'); // 'rating', 'experience_desc'
 
-  const filteredAndSortedTutors = useMemo(() => {
-    let tutors = mockTutors.filter(tutor => {
-      const nameMatch = tutor.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const headlineMatch = tutor.headline?.toLowerCase().includes(searchTerm.toLowerCase());
-      const subjectMatch = selectedSubject ? tutor.subjectMatterExpertise?.includes(selectedSubject) : true;
-      const expertiseMatch = tutor.subjectMatterExpertise?.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
-      return (nameMatch || headlineMatch || expertiseMatch) && subjectMatch;
-    });
+  // Calculate filteredAndSortedTutors directly on each render
+  // This ensures that if mockTutors array is updated (e.g., by a new signup),
+  // this component will use the fresh data upon its next render.
+  let filteredAndSortedTutors = mockTutors.filter(tutor => {
+    const nameMatch = tutor.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const headlineMatch = tutor.headline?.toLowerCase().includes(searchTerm.toLowerCase());
+    const subjectMatch = selectedSubject ? tutor.subjectMatterExpertise?.includes(selectedSubject) : true;
+    const expertiseMatch = tutor.subjectMatterExpertise?.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
+    return (nameMatch || headlineMatch || expertiseMatch) && subjectMatch;
+  });
 
-    if (sortBy === 'rating') {
-      tutors.sort((a, b) => (b.overallRating || 0) - (a.overallRating || 0));
-    } else if (sortBy === 'experience_desc') {
-      tutors.sort((a, b) => (b.yearsOfExperience || 0) - (a.yearsOfExperience || 0));
-    }
-
-    return tutors;
-  }, [searchTerm, selectedSubject, sortBy]);
+  if (sortBy === 'rating') {
+    filteredAndSortedTutors.sort((a, b) => (b.overallRating || 0) - (a.overallRating || 0));
+  } else if (sortBy === 'experience_desc') {
+    filteredAndSortedTutors.sort((a, b) => (b.yearsOfExperience || 0) - (a.yearsOfExperience || 0));
+  }
 
   return (
     <div className="space-y-8">
@@ -93,7 +93,7 @@ export default function FindTutorsPage() {
       ) : (
         <Card className="text-center py-12 shadow">
           <CardContent>
-            <Users2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" /> {/* Changed Users to Users2 */}
+            <Users2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-foreground">No Tutors Found</h3>
             <p className="text-muted-foreground mt-2">Try adjusting your search or filters.</p>
             {(searchTerm || selectedSubject) && (
@@ -107,3 +107,4 @@ export default function FindTutorsPage() {
     </div>
   );
 }
+
