@@ -16,12 +16,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth"; // useAuth will now have a signup method
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Loader2, UserPlus } from "lucide-react";
-import { mockStudents, mockTutors } from "@/lib/mock-data";
-import type { Student, Tutor, User } from "@/types";
+// mockStudents and mockTutors are no longer directly manipulated here for signup
+// import type { Student, Tutor, User } from "@/types"; // User type might still be useful
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -31,7 +31,7 @@ const formSchema = z.object({
 });
 
 export default function SignupForm() {
-  const { login } = useAuth(); 
+  const { signup } = useAuth(); // Get signup from the hook
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export default function SignupForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      name: "Ama Oforiwaa",
       email: "",
       password: "",
       role: "student",
@@ -54,82 +54,28 @@ export default function SignupForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setError(null);
-    // Simulate API call for registration
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Create a new mock user
-    const newUserId = `user${Date.now()}`;
-    const newUserBase = {
-      id: newUserId,
-      name: values.name,
-      email: values.email,
-      // Password is not stored in mock user object for simplicity
-      avatarUrl: `https://picsum.photos/seed/${newUserId}/200/200`,
-    };
-
-    let newUser: User;
-
-    if (values.role === 'student') {
-      newUser = {
-        ...newUserBase,
-        role: 'student',
-        bio: "New student, eager to learn!",
-        learningPreferences: "Not specified yet.",
-        subjectInterests: [],
-      } as Student;
-      mockStudents.push(newUser as Student);
-      // Assign student to the first tutor for simplicity
-      if (mockTutors.length > 0) {
-        const tutorToAssign = mockTutors[0];
-        if (!tutorToAssign.assignedStudentIds) {
-          tutorToAssign.assignedStudentIds = [];
-        }
-        // Ensure no duplicates if this logic runs multiple times for the same user (though unlikely with newUserId)
-        if (!tutorToAssign.assignedStudentIds.includes(newUser.id)) {
-            tutorToAssign.assignedStudentIds.push(newUser.id);
-        }
-      }
-    } else {
-      newUser = {
-        ...newUserBase,
-        role: 'tutor',
-        bio: "New tutor, ready to teach!",
-        headline: "Enthusiastic new tutor",
-        subjectMatterExpertise: [],
-        descriptionOfExpertise: "Looking forward to helping students!",
-        teachingStyle: "Flexible and adaptive",
-        yearsOfExperience: 0,
-        assignedStudentIds: [],
-      } as Tutor;
-      mockTutors.push(newUser as Tutor);
-    }
     
     try {
-      // Log in the newly created user by passing the full user object
-      login(newUser); 
+      await signup({ 
+        email: values.email, 
+        password: values.password,
+        name: values.name,
+        role: values.role,
+        // avatarUrl can be defaulted in the signup function or added later
+      });
       router.push("/dashboard"); 
-    } catch (e) {
-      setError("Signup failed. Please try again.");
-      // remove user from mock data if login fails
-      if (values.role === 'student') {
-        const index = mockStudents.findIndex(s => s.id === newUserId);
-        if (index > -1) mockStudents.splice(index, 1);
-         // Also remove from tutor's assigned list if assignment happened
-        if (mockTutors.length > 0 && mockTutors[0].assignedStudentIds?.includes(newUserId)) {
-            mockTutors[0].assignedStudentIds = mockTutors[0].assignedStudentIds.filter(id => id !== newUserId);
-        }
+    } catch (e: any) {
+      const firebaseError = e as { code?: string; message?: string };
+      if (firebaseError.code === 'auth/email-already-in-use') {
+        setError("This email address is already in use.");
       } else {
-        const index = mockTutors.findIndex(t => t.id === newUserId);
-        if (index > -1) mockTutors.splice(index, 1);
+        setError(firebaseError.message || "Signup failed. Please try again.");
       }
-    } finally {
       setIsLoading(false);
     }
   }
 
   if (!isClient) {
-     // Render nothing or a placeholder on the server and during initial client render
-    // to prevent hydration mismatch. The actual form will render after useEffect.
     return null;
   }
 
@@ -143,7 +89,7 @@ export default function SignupForm() {
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input placeholder="Ama Oforiwaa" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -212,10 +158,9 @@ export default function SignupForm() {
           ) : (
             <UserPlus className="mr-2 h-4 w-4" />
           )}
-          Create Account
+          Sign Up
         </Button>
       </form>
     </Form>
   );
 }
-

@@ -1,8 +1,9 @@
+
 'use client';
 
 import Header from '@/components/layout/header';
 import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation'; // Added usePathname
 import React, { useEffect } from 'react';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -11,16 +12,27 @@ export default function MainAppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, firebaseUser } = useAuth(); // Added firebaseUser
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    // If still loading auth state, or if on an auth page, don't redirect
+    if (isLoading || pathname.startsWith('/login') || pathname.startsWith('/signup')) {
+      return;
+    }
+    // If done loading and no Firebase user is authenticated, redirect to login
+    if (!isLoading && !firebaseUser) {
       router.push('/login');
     }
-  }, [user, isLoading, router]);
+    // If Firebase user exists but user profile (from Firestore) is null (could be during initial load after auth)
+    // and still loading, we wait. If done loading and profile is still null, it might indicate an issue,
+    // but onAuthStateChanged in useAuth should handle this by logging out if Firestore doc is missing.
+    // So, the primary check is !firebaseUser for redirection.
+  }, [firebaseUser, isLoading, router, pathname]);
 
-  if (isLoading || !user) {
+  // Show loading indicator if auth state is loading OR if firebaseUser exists but profile (user) is still loading
+  if (isLoading || (firebaseUser && !user && !pathname.startsWith('/login') && !pathname.startsWith('/signup'))) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -34,10 +46,23 @@ export default function MainAppLayout({
     );
   }
 
+  // If not loading and no user (which implies no firebaseUser after effect runs), and not on auth pages,
+  // this content shouldn't ideally be reached due to redirect, but as a fallback.
+  if (!user && !isLoading && !pathname.startsWith('/login') && !pathname.startsWith('/signup')) {
+     // This state should be covered by the useEffect redirect.
+     // If it's reached, it might be a flicker before redirect or an edge case.
+     // Showing loader is consistent.
+     return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">Redirecting...</p>
+      </div>
+    );
+  }
+
+
   return (
-    <div className="min-h-screen flex flex-col bg-background"> {/* Overall page background remains dark */}
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      {/* Main content area changed to white background with dark text */}
       <main className="flex-grow container mx-auto max-w-screen-2xl px-4 py-8 md:px-8 bg-white text-zinc-900">
         {children}
       </main>

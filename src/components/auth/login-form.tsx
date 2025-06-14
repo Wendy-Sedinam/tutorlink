@@ -15,24 +15,23 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Loader2, LogIn } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { mockStudents, mockTutors } from "@/lib/mock-data";
-import type { User } from "@/types";
+// RadioGroup and Label for role selection is removed as role is determined by Firestore data after login.
+// If different login forms per role are needed, this can be re-added, but typically email is unique.
 
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-  role: z.enum(["student", "tutor"], { required_error: "You must select a role."}),
+  // Role is no longer part of the login form itself, it's part of the user data in Firestore
 });
 
 export default function LoginForm() {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
@@ -46,38 +45,28 @@ export default function LoginForm() {
     defaultValues: {
       email: "",
       password: "",
-      role: "student",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setError(null);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    let foundUser: User | undefined;
-
-    if (values.role === 'student') {
-      foundUser = mockStudents.find(s => s.email === values.email);
-    } else {
-      foundUser = mockTutors.find(t => t.email === values.email);
-    }
-    
-    if (foundUser) {
-      // In a real app, you would also verify the password here.
-      // For this mock app, finding by email and role is sufficient.
-      login(foundUser); // Pass the full user object
-      router.push("/dashboard");
-    } else {
-      setError("Login failed. User not found or incorrect credentials/role.");
-      setIsLoading(false); // Ensure loading is stopped on error
+    try {
+      await login({ email: values.email, password: values.password });
+      const redirectUrl = searchParams.get('redirect') || "/dashboard";
+      router.push(redirectUrl);
+    } catch (e: any) {
+      const firebaseError = e as { code?: string; message?: string };
+      if (firebaseError.code === 'auth/user-not-found' || firebaseError.code === 'auth/wrong-password' || firebaseError.code === 'auth/invalid-credential') {
+        setError("Invalid email or password.");
+      } else {
+        setError(firebaseError.message || "Login failed. Please try again.");
+      }
+      setIsLoading(false);
     }
   }
 
   if (!isClient) {
-    // Render nothing or a placeholder on the server and during initial client render
-    // to prevent hydration mismatch. The actual form will render after useEffect.
     return null; 
   }
 
@@ -110,36 +99,7 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel>Login as</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex space-x-4"
-                >
-                  <FormItem className="flex items-center space-x-2 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="student" id="role-student"/>
-                    </FormControl>
-                    <Label htmlFor="role-student" className="font-normal">Student</Label>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-2 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="tutor" id="role-tutor" />
-                    </FormControl>
-                    <Label htmlFor="role-tutor" className="font-normal">Tutor</Label>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Role selection removed from login form */}
         {error && <p className="text-sm font-medium text-destructive">{error}</p>}
         <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
           {isLoading ? (
@@ -153,4 +113,3 @@ export default function LoginForm() {
     </Form>
   );
 }
-
