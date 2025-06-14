@@ -1,4 +1,4 @@
-# **App Name**: MentorLink
+# **App Name**: TutorLink
 
 ## Core Features:
 
